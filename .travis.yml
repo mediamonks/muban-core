@@ -9,27 +9,15 @@ node_js:
 
 sudo: false
 
-before_install:
-  - yarn global add codeclimate-test-reporter
-
 script:
   - yarn test
-
-after_script:
-  - codeclimate-test-reporter < coverage/lcov.info
-  - node_modules/.bin/coveralls < coverage/lcov.info
 
 deploy:
   - provider: npm
     email: 'devmonk@mediamonks.com'
     api_key:
-      secure: 'LJXHK/prWdaAKk7hlh5mN0I/owaatGLW22T877KQYlbMzNFM0jPSxMhaTNLHdOFUcez7P/EXjNFeGIhDeh7DxQliw6sJ5CLGUqlKSAoVnoGmA0HFVnD2PSmOFGzUuLgNOQ76WweUK9cU1uvx49zoiKUmyGWYSSeJhQGSgLCY6gbsAxYEJzhLVDYP1aEPJYuvjGuRIrcJ4R9pTmiJOMyjsMxRv+KMKiaV7d9MNMSgUl4n3JAfZ41+D4qFyPHbUAumPPs0tPwgD7N6lptQdkNFiZvB2cVvTFytny8BcC53/K7z+8Hy4+aB+4o7JwY2RX+A9Ys4zif6MTaoySAbpjweAIdmEr2YSrItr9LNxlqRdryknoDLvn63dxbQyJf1tsvT/KVabK48pPK4qEDHw0e0DZnsPXr6Me5mO3553RNyS0NnPP+qkeybqpx6Tbl/Akz0UX8bUVAWX3+/1bSONghSRyYAF47ktJjeBQIMMTxIgR/6gKJmVDrieC+bEHUCCmg9uscrS3iUG7yOR5PW7sCNYrOewPyZ1xO36tJ03FUrwIl08jV659yYGpiM4T386xKZSpKV4aUWjj/y3WockNTmEey07Lk5QO0O5aLS1N7fPyP07lgGNl6uFny8B6c/vH6F+MTtE3WISRytVK9hefdWMxMbKSFalI8cOAnzmkXx+vU='
+      secure: 'K1pQ5f6JHksTeDjnIkqxNDvwFIY3c2606py01EZ8wROCUUsEIlX6GGmip30/xIANT4WVm74i2/bkR+RrlyXzQSVT5CuD8ob/WcC/Ez+C36NIXustrHo3lEQS0K0e3HmQxm/TBHetk9L+vVe4/lQzbQPG2OjVQfn202B5eAOaV4alRn6+9KU1rRBp9ctrVSCa4bu7rPDGnEZstqB8el27LDz5g0WphU6i4LWSeUaoZhCG41G6/ui1dK491M6TcaGpbUQW1eck5gsM6S0iHvB4/jbUOg6V7+334nXylcQ86jDamXyA9fJqB6p2E+/yPs3wTY5emAMbR5W6CT/S9KXrDILWvrXK9a+Cu98yMSf/yUpQedyTNMpB24D4Ch3GqzgrSacYTe3NX/HtygLYJayt/iwz8ZmJZWRZYfkEuiE8va4Ex6+Fv6o27eVGKDowqhKnOaaut0J01DngoV6n6I6AbjjGABJBl4tiKDxUCUcXZl7z1wFZRbKcJB6If7kJD/1n9wvw9RmdIWAGBJyZ/Yp9Z9lybFQ0SArQeFlvYhXjc85o5wDxFaR60ccNDw8OaKbFyB0JmqtJX4fWVVywNutzCGQ4IKPeeNLESrKc9zdnlSbHLMj2rxXUPmEStvB+fR9rZikZXa7DlAMv3jLXt/0+BXHJU5u22rwXKjuX34gjMpM='
     on:
       tags: true
       node: '8'
     skip_cleanup: true
-
-addons:
-  code_climate:
-    repo_token:
-      secure: 'jMib2LNFGzfKiINRK0fOwibNgHnizTh87Fb1YK0Q2UpWtF7WiigEBhNyiX3pF02HH3iRuICHKYzE1QrZbIzk88XVTUhilO7vI+h1VpgbcuOxq7nkE+kSfxAiTpkD6eY7c0s8wSViKTPOVPPrpRfp8RYYLx6Vcox9jlN7StOHAgDuiwGwHPZ6lz2KGzX1xx8Z8ZLnHIIihv7rqQgetu7BNoPcrPv2Dz63qZI3DbFPWVJIe05B6I7iuiPgzlRZzIvUWofpp6zM5jT9ktrGyF786sh15mDzixoDzUDKmw6ptbc7MeoEuT2Co7FYr4LibXClSaoXcfKJ37/6E5Xzya1e7Sz/83+H1Xi34LCUcVHySzmCWSMWa1fGnZMCHJUdhCVmY5EJMQSGJEvPwHt+1beRYsWAm0cP2RsZ3LhIj9uB6jVXUz1pmhlkL2AFiuBZ2D3vKw4DTtnKqBounsI/FFm0Z0bhsOfkUs7HzAtdnPGjkzlHYW//YvncmTaO0fnMswJVLTKlMq9J/VnqLF1bH2CVYO9zBXIvf786SwgNrWAW/nmyOHE0kOzo79OVfm147qTPmF93ajwLWA814HUK8xpPZ5nMLgFaPpqlNO8co/5gpGm3cRrxRQ2yeOMCealz/EVJYS9LUmYugR42Ayg6iHLRoqwCKdtsjhMFZNEAOwsMs80='
