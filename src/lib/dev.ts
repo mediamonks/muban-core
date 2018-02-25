@@ -16,7 +16,7 @@ function createIndexRenderer(appRoot, jsonModules) {
     appRoot.innerHTML = indexTemplate({
       pages: Object.keys(jsonModules)
         .map(key => ({
-          page: path.basename(key, '.yaml'),
+          page: path.basename(key, `.${key.split('.').pop()}`),
           data: jsonModules[key],
         }))
         .sort()
@@ -32,7 +32,9 @@ function createIndexRenderer(appRoot, jsonModules) {
 function createPageRenderer(appRoot, jsonModules, pageName) {
   let initTimeout;
   return () => {
-    appRoot.innerHTML = appTemplate(jsonModules[`./${pageName}.yaml`]);
+    appRoot.innerHTML = appTemplate(
+      jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
+    );
 
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
@@ -88,7 +90,12 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       const changedModules = getChanged(changedContext, jsonModules);
 
       // only re-render if the current page data is changed
-      if (changedModules.some(({ key }) => key === `./${pageName}.yaml`)) {
+      if (
+        changedModules.some(
+          ({ key }) => key === `./${pageName}.yaml` || key === `./${pageName}.json`,
+        )
+      ) {
+        update();
       }
     },
 
