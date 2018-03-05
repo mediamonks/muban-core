@@ -4,7 +4,13 @@ import { getComponents, setComponentInstance } from './componentStore';
 /**
  * Called to init components for the elements in the DOM.
  *
- * @param {HTMLElement} rootElement
+ * Once the component tree for the passed rootELement is fully constructed, the adopted() lifecycle
+ * method will be called on all new components that implement that method.
+ * When the adopted() method is called, it means that the component is fully adopted by all its
+ * parents and the application is fully mounted.
+ *
+ * @param {HTMLElement} rootElement Only components on or in this element will be constructed, this
+ * means you can update a new section of HTML at a later time.
  */
 export default function initComponents(rootElement: HTMLElement): void {
   const list = [];
@@ -38,6 +44,8 @@ export default function initComponents(rootElement: HTMLElement): void {
   // before any parents, allowing the parents to directly reference them
   const sortedList = sortBy(list, ['depth']).reverse();
 
+  const newInstances = [];
+
   // create all corresponding classes
   sortedList.forEach(({ component, element }) => {
     const BlockConstructor = component;
@@ -47,9 +55,16 @@ export default function initComponents(rootElement: HTMLElement): void {
     try {
       const instance = new BlockConstructor(element);
       setComponentInstance(displayName, { instance, element });
+      newInstances.push(instance);
     } catch (e) {
       // tslint:disable-next-line no-console
       console.error(e);
+    }
+  });
+
+  newInstances.forEach(instance => {
+    if (typeof instance.adopted === 'function') {
+      instance.adopted();
     }
   });
 }

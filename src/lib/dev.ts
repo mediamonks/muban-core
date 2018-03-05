@@ -47,7 +47,6 @@ export type BootstrapOptions = {
   indexTemplate: any;
   appTemplate: any;
   dataContext: any;
-  dataContextHot: any;
   partialsContext: any;
   Handlebars: any;
 };
