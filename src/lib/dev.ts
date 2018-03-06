@@ -11,8 +11,8 @@ import { getChanged, getModuleContext } from './utils/webpackUtils';
 let indexTemplate;
 let appTemplate;
 
-function createIndexRenderer(appRoot, jsonModules) {
-  return () => {
+function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate) {
+  return update => {
     appRoot.innerHTML = indexTemplate({
       pages: Object.keys(jsonModules)
         .map(key => ({
@@ -26,12 +26,13 @@ function createIndexRenderer(appRoot, jsonModules) {
           link: `${page}.html`,
         })),
     });
+    update ? onUpdate && onUpdate() : onInit && onInit();
   };
 }
 
-function createPageRenderer(appRoot, jsonModules, pageName) {
+function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate) {
   let initTimeout;
-  return () => {
+  return update => {
     appRoot.innerHTML = appTemplate(
       jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
     );
@@ -39,8 +40,25 @@ function createPageRenderer(appRoot, jsonModules, pageName) {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
     clearTimeout(initTimeout);
-    initTimeout = setTimeout(() => initComponents(appRoot), 100);
+    initTimeout = setTimeout(() => {
+      initComponents(appRoot);
+      update ? onUpdate && onUpdate() : onInit && onInit();
+    }, 100);
   };
+}
+
+function registerComponent(path, content, options) {
+  const map = options.registerPartialMap || [
+    path => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
+  ];
+  let res;
+  map.some(x => {
+    if ((res = x(path))) {
+      options.Handlebars.registerPartial(res, content);
+    }
+    // if we have one match, ignore the others, otherwise we might register a component twice
+    return !!res;
+  });
 }
 
 export type BootstrapOptions = {
@@ -49,6 +67,9 @@ export type BootstrapOptions = {
   dataContext: any;
   partialsContext: any;
   Handlebars: any;
+  onInit?: () => void;
+  onUpdate?: () => void;
+  registerPartialMap?: Array<(path: string) => string | null>;
 };
 
 export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
@@ -63,21 +84,18 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
 
   const update = () => {
     cleanElement(appRoot);
-    renderer();
+    renderer(true);
   };
 
   const [jsonModules] = getModuleContext(options.dataContext);
   const [partialModules] = getModuleContext(options.partialsContext, (_, key, module) => {
-    // only blocks have to be registered, the others are automatically done by the hbs-loader
-    if (key.includes('/block/')) {
-      options.Handlebars.registerPartial(/\/([^/]+)\.hbs/gi.exec(key)[1], module);
-    }
+    registerComponent(key, module, options);
   });
 
   if (pageName === 'index') {
-    renderer = createIndexRenderer(appRoot, jsonModules);
+    renderer = createIndexRenderer(appRoot, jsonModules, options.onInit, options.onUpdate);
   } else {
-    renderer = createPageRenderer(appRoot, jsonModules, pageName);
+    renderer = createPageRenderer(appRoot, jsonModules, pageName, options.onInit, options.onUpdate);
   }
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -104,10 +122,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       const changedModules = getChanged(changedContext, partialModules);
 
       changedModules.forEach(({ key, content }) => {
-        // register updated partials and re-render the page
-        if (key.includes('/block/')) {
-          options.Handlebars.registerPartial(/\/([^/]+)\.hbs/gi.exec(key)[1], content);
-        }
+        registerComponent(key, content, options);
       });
 
       update();
