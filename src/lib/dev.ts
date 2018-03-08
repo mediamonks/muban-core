@@ -13,19 +13,54 @@ let appTemplate;
 
 function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate) {
   return update => {
-    appRoot.innerHTML = indexTemplate({
-      pages: Object.keys(jsonModules)
-        .map(key => ({
+    const pages = Object.keys(jsonModules)
+      .map(key => {
+        const item = {
           page: path.basename(key, `.${key.split('.').pop()}`),
           data: jsonModules[key],
-        }))
-        .sort()
-        .map(({ page, data }) => ({
-          page,
-          data,
-          link: `${page}.html`,
-        })),
+        };
+        if (!item.data.meta) {
+          item.data.meta = {};
+        }
+        if (item.page.includes('.')) {
+          item.data.meta.alt = true;
+        }
+        return item;
+      })
+      .sort((a, b) => {
+        if (a.data.meta.alt || b.data.meta.alt) {
+          // sort on alt
+          if (a.page.startsWith(b.page)) return 1;
+          if (b.page.startsWith(a.page)) return -1;
+        }
+        return String(a.data.meta.id || a.page).localeCompare(String(b.data.meta.id || b.page));
+      })
+      .map(({ page, data }) => ({
+        page,
+        data,
+        link: `${page}.html`,
+      }));
+
+    const categoryMap = pages.reduce((cats, page) => {
+      const category = page.data.meta.category || 'default';
+      if (!cats[category]) {
+        cats[category] = [];
+      }
+      cats[category].push(page);
+      return cats;
+    }, {});
+
+    const categories = Object.keys(categoryMap).map(key => ({
+      name: key,
+      pages: categoryMap[key],
+    }));
+
+    appRoot.innerHTML = indexTemplate({
+      pages,
+      categories,
+      showCategories: categories.length > 1,
     });
+    initComponents(appRoot);
     update ? onUpdate && onUpdate() : onInit && onInit();
   };
 }
