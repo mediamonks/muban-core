@@ -6,6 +6,7 @@ import 'modernizr';
 import path from 'path';
 import cleanElement from './utils/cleanElement';
 import initComponents from './utils/initComponents';
+import { waitForLoadedStyleSheets } from './utils/waitForStyleSheetsLoaded';
 import { getChanged, getModuleContext } from './utils/webpackUtils';
 
 let indexTemplate;
@@ -55,30 +56,32 @@ function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate) {
       pages: categoryMap[key],
     }));
 
-    appRoot.innerHTML = indexTemplate({
-      pages,
-      categories,
-      showCategories: categories.length > 1,
+    waitForLoadedStyleSheets(document).then(() => {
+      appRoot.innerHTML = indexTemplate({
+        pages,
+        categories,
+        showCategories: categories.length > 1,
+      });
+      initComponents(appRoot);
+      update ? onUpdate && onUpdate() : onInit && onInit();
     });
-    initComponents(appRoot);
-    update ? onUpdate && onUpdate() : onInit && onInit();
   };
 }
 
 function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate) {
-  let initTimeout;
   return update => {
-    appRoot.innerHTML = appTemplate(
-      jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
-    );
-
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
-    clearTimeout(initTimeout);
-    initTimeout = setTimeout(() => {
+    waitForLoadedStyleSheets(document).then(() => {
+      // render page with data
+      appRoot.innerHTML = appTemplate(
+        jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
+      );
+      // init components
       initComponents(appRoot);
+
       update ? onUpdate && onUpdate() : onInit && onInit();
-    }, 100);
+    });
   };
 }
 
