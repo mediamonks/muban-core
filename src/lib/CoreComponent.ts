@@ -1,8 +1,10 @@
-export default class CoreComponent {
-  protected data: { [key: string]: string };
-  protected element: HTMLElement;
+import Disposable from 'seng-disposable/lib/Disposable';
+
+export default class CoreComponent extends Disposable {
+  public element: HTMLElement;
 
   constructor(element: HTMLElement) {
+    super();
     this.element = element;
   }
 
@@ -30,6 +32,7 @@ export default class CoreComponent {
 
   dispose() {
     this.element = null;
-    this.data = null;
+
+    super.dispose();
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "muban-core",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "The core library and webpack loaders for Muban",
   "main": "./index.js",
   "types": "./index.d.ts",
@@ -99,6 +99,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.35",
-    "loader-utils": "^1.1.0"
+    "loader-utils": "^1.1.0",
+    "seng-disposable": "^1.1.3"
   }
 }
