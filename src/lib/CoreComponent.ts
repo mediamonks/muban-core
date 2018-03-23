@@ -15,8 +15,8 @@ export default class CoreComponent extends Disposable {
    * @param {HTMLElement} container
    * @returns {HTMLElement}
    */
-  public getElement(selector: string, container: HTMLElement = this.element): HTMLElement {
-    return <HTMLElement>container.querySelector(selector);
+  public getElement<T extends Element = HTMLElement>(selector: string, container: HTMLElement = this.element): T {
+    return container.querySelector(selector);
   }
 
   /**
@@ -26,8 +26,8 @@ export default class CoreComponent extends Disposable {
    * @param {HTMLElement} container
    * @returns {Array<HTMLElement>}
    */
-  public getElements(selector: string, container: HTMLElement = this.element): Array<HTMLElement> {
-    return <Array<HTMLElement>>Array.from(container.querySelectorAll(selector));
+  public getElements<T extends Element = HTMLElement>(selector: string, container: HTMLElement = this.element): Array<T> {
+    return Array.from(container.querySelectorAll(selector));
   }
 
   dispose() {
