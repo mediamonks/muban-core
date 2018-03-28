@@ -108,12 +108,18 @@ export type BootstrapOptions = {
   onInit?: () => void;
   onUpdate?: () => void;
   registerPartialMap?: Array<(path: string) => string | null>;
+  pageName?: string;
 };
 
 export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   // Get info for current page
-  const pageMatch = /\/(.*)\.html/i.exec(document.location.pathname);
-  const pageName = (pageMatch && pageMatch[1]) || 'index';
+  let pageName;
+  if (options.pageName) {
+    pageName = options.pageName;
+  } else {
+    const pageMatch = /\/(.*)\.html/i.exec(document.location.pathname);
+    pageName = (pageMatch && pageMatch[1]) || 'index';
+  }
 
   indexTemplate = options.indexTemplate;
   appTemplate = options.appTemplate;
