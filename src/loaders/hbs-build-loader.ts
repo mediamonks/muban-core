@@ -19,12 +19,15 @@ export default function(this: any, content) {
   const done = this.async();
   this.cacheable();
 
-  const {
-    removeScript = false,
-    removeStyle = false,
-    removeTemplate = false,
-    hot = true,
-  } = loaderUtils.getOptions(this);
+  const options = loaderUtils.getOptions(this);
+  let removeTemplate;
+  const { removeScript = false, removeStyle = false, hot = true } = options;
+
+  if (/\?.*include/.test(loaderContext.resourceQuery)) {
+    removeTemplate = false;
+  } else {
+    removeTemplate = options.removeTemplate || false;
+  }
 
   // extract script and style includes, and remove them from the content
   const { scripts, styles, content: strippedContent } = extractIncludes(content);
