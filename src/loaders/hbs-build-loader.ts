@@ -23,7 +23,9 @@ export default function(this: any, content) {
   let removeTemplate;
   const { removeScript = false, removeStyle = false, hot = true } = options;
 
-  if (/\?.*include/.test(loaderContext.resourceQuery)) {
+  const includeTemplateInBuild = /\?.*include/.test(loaderContext.resourceQuery);
+
+  if (includeTemplateInBuild) {
     removeTemplate = false;
   } else {
     removeTemplate = options.removeTemplate || false;
@@ -37,7 +39,7 @@ export default function(this: any, content) {
   newContent = processScripts(scripts, { loaderContext, removeScript, hot }) + newContent;
   newContent = processStyles(styles, { loaderContext, removeStyle }) + newContent;
 
-  newContent += processTemplate(strippedContent, { removeTemplate });
+  newContent += processTemplate(strippedContent, { removeTemplate }, includeTemplateInBuild);
 
   done(null, newContent);
 }
@@ -110,8 +112,11 @@ ${styles.map(style => `require(${loaderUtils.stringifyRequest(loaderContext, sty
 `;
 }
 
-function processTemplate(content, { removeTemplate }) {
+function processTemplate(content, { removeTemplate }, includeTemplateInBuild) {
   if (!removeTemplate) {
+    if (includeTemplateInBuild) {
+      return content.replace(/require\("([\w/\\]+.hbs)"\)/gi, 'require("$1?include")');
+    }
     return content;
   }
   // only keep requires from original template
