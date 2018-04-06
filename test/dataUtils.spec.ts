@@ -55,10 +55,11 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      renderItem(div, template, {text: 'foobar'});
+      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'});
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 
@@ -106,10 +107,11 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      renderItem(div, template, {text: 'foobar'}, true);
+      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'}, true);
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 
@@ -160,10 +162,11 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      renderItems(div, template, [{text: 'foobar'}, {text: 'baz'}]);
+      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}]);
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
+      expect(items.length).to.equal(2);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 
@@ -211,10 +214,11 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      renderItems(div, template, [{text: 'foobar'}, {text: 'baz'}], true);
+      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}], true);
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
+      expect(items.length).to.equal(2);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 

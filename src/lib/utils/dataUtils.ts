@@ -1,25 +1,29 @@
 import cleanElement from './cleanElement';
 import initComponents from './initComponents';
 
-export function renderItem(
+export function renderItem<T extends Element = HTMLElement>(
   container: HTMLElement,
   template: (data?: any) => string,
   data: any,
   append: boolean = false,
-) {
-  render(container, append, () => template(data));
+): T {
+  return render<T>(container, append, () => template(data))[0];
 }
 
-export function renderItems(
+export function renderItems<T extends Element = HTMLElement>(
   container: HTMLElement,
   template: (data?: any) => string,
   data: Array<any>,
   append: boolean = false,
 ) {
-  render(container, append, () => data.reduce((html, d) => html + template(d), ''));
+  return render<T>(container, append, () => data.reduce((html, d) => html + template(d), ''));
 }
 
-function render(container: HTMLElement, append: boolean, getHtml: () => string) {
+function render<T extends Element = HTMLElement>(
+  container: HTMLElement,
+  append: boolean,
+  getHtml: () => string,
+): Array<T> {
   if (!append) {
     // dispose all created component instances
     cleanElement(container);
@@ -32,7 +36,7 @@ function render(container: HTMLElement, append: boolean, getHtml: () => string) 
   const div = document.createElement('div');
   div.innerHTML = getHtml();
 
-  const children = Array.from(div.children);
+  const children = <Array<T>>Array.from(div.children);
   for (const child of children) {
     fragment.appendChild(child);
   }
@@ -42,10 +46,13 @@ function render(container: HTMLElement, append: boolean, getHtml: () => string) 
   if (append) {
     // only init the newly added component(s)
     for (const child of children) {
-      initComponents(<HTMLElement>child);
+      // TODO: Element (T) cannot be cast to HTMLElement (from initComponents)
+      initComponents(<HTMLElement>(<any>child));
     }
   } else {
     // initialize new components for the new element
     initComponents(container);
   }
+
+  return children;
 }
