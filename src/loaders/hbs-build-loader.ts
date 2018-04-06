@@ -115,7 +115,7 @@ ${styles.map(style => `require(${loaderUtils.stringifyRequest(loaderContext, sty
 function processTemplate(content, { removeTemplate }, includeTemplateInBuild) {
   if (!removeTemplate) {
     if (includeTemplateInBuild) {
-      return content.replace(/require\("([\w/\\]+.hbs)"\)/gi, 'require("$1?include")');
+      return content.replace(/require\("([\w/\\. -]+.hbs)"\)/gi, 'require("$1?include")');
     }
     return content;
   }
