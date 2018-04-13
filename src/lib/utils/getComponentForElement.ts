@@ -1,5 +1,5 @@
 import { getComponentInstances, hasComponentInstance } from './componentStore';
-import CoreComponent from '../CoreComponent';
+import ICoreComponent from '../interface/ICoreComponent';
 
 /**
  * Given a DOM element, retrieve the attached class instance
@@ -14,7 +14,9 @@ import CoreComponent from '../CoreComponent';
  * @param {HTMLElement} element
  * @return {CoreComponent}
  */
-export default function getComponentForElement(element: HTMLElement): CoreComponent {
+export default function getComponentForElement<T extends ICoreComponent = ICoreComponent>(
+  element: HTMLElement,
+): T {
   const displayName = element.getAttribute('data-component');
 
   if (displayName && hasComponentInstance(displayName)) {

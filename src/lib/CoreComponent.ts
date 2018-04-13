@@ -1,6 +1,7 @@
 import Disposable from 'seng-disposable/lib/Disposable';
+import ICoreComponent from './interface/ICoreComponent';
 
-export default class CoreComponent extends Disposable {
+export default class CoreComponent extends Disposable implements ICoreComponent {
   public element: HTMLElement;
 
   constructor(element: HTMLElement) {
@@ -15,7 +16,10 @@ export default class CoreComponent extends Disposable {
    * @param {HTMLElement} container
    * @returns {HTMLElement}
    */
-  public getElement<T extends Element = HTMLElement>(selector: string, container: HTMLElement = this.element): T {
+  public getElement<T extends Element = HTMLElement>(
+    selector: string,
+    container: HTMLElement = this.element,
+  ): T {
     return container.querySelector(selector);
   }
 
@@ -26,7 +30,10 @@ export default class CoreComponent extends Disposable {
    * @param {HTMLElement} container
    * @returns {Array<HTMLElement>}
    */
-  public getElements<T extends Element = HTMLElement>(selector: string, container: HTMLElement = this.element): Array<T> {
+  public getElements<T extends Element = HTMLElement>(
+    selector: string,
+    container: HTMLElement = this.element,
+  ): Array<T> {
     return Array.from(container.querySelectorAll(selector));
   }
 
