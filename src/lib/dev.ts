@@ -12,7 +12,7 @@ import { getChanged, getModuleContext } from './utils/webpackUtils';
 let indexTemplate;
 let appTemplate;
 
-function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate) {
+function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate, onBeforeInit) {
   return update => {
     const pages = Object.keys(jsonModules)
       .map(key => {
@@ -62,13 +62,19 @@ function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate) {
         categories,
         showCategories: categories.length > 1,
       });
+
+      if (!update) {
+        onBeforeInit && onBeforeInit();
+      }
+
       initComponents(appRoot);
+
       update ? onUpdate && onUpdate() : onInit && onInit();
     });
   };
 }
 
-function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate) {
+function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate, onBeforeInit) {
   return update => {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
@@ -77,6 +83,11 @@ function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate) {
       appRoot.innerHTML = appTemplate(
         jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
       );
+
+      if (!update) {
+        onBeforeInit && onBeforeInit();
+      }
+
       // init components
       initComponents(appRoot);
 
@@ -105,6 +116,7 @@ export type BootstrapOptions = {
   dataContext: any;
   partialsContext: any;
   Handlebars: any;
+  onBeforeInit?: () => void;
   onInit?: () => void;
   onUpdate?: () => void;
   registerPartialMap?: Array<(path: string) => string | null>;
@@ -137,9 +149,22 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   });
 
   if (pageName === 'index') {
-    renderer = createIndexRenderer(appRoot, jsonModules, options.onInit, options.onUpdate);
+    renderer = createIndexRenderer(
+      appRoot,
+      jsonModules,
+      options.onInit,
+      options.onUpdate,
+      options.onBeforeInit,
+    );
   } else {
-    renderer = createPageRenderer(appRoot, jsonModules, pageName, options.onInit, options.onUpdate);
+    renderer = createPageRenderer(
+      appRoot,
+      jsonModules,
+      pageName,
+      options.onInit,
+      options.onUpdate,
+      options.onBeforeInit,
+    );
   }
 
   document.addEventListener('DOMContentLoaded', () => {
