@@ -17,7 +17,7 @@ import ICoreComponent from '../interface/ICoreComponent';
 export default function getComponentForElement<T extends ICoreComponent = ICoreComponent>(
   element: HTMLElement,
 ): T {
-  const displayName = element.getAttribute('data-component');
+  const displayName = element && element.getAttribute('data-component');
 
   if (displayName && hasComponentInstance(displayName)) {
     return (<any>(getComponentInstances(displayName).find(b => b.element === element) || {}))
