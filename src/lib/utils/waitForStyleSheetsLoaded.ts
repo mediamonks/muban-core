@@ -1,4 +1,4 @@
-export const waitForLoadedStyleSheets = document =>
+export const waitForLoadedStyleSheets = (document: Document) =>
   new Promise(resolve => {
     const links = <Array<HTMLLinkElement>>Array.from(
       document.querySelectorAll('link[rel=stylesheet]'),

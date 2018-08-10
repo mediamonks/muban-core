@@ -19,7 +19,7 @@ export default class CoreComponent extends Disposable implements ICoreComponent 
   public getElement<T extends Element = HTMLElement>(
     selector: string,
     container: HTMLElement = this.element,
-  ): T {
+  ): T | null {
     return container.querySelector(selector);
   }
 
@@ -35,11 +35,5 @@ export default class CoreComponent extends Disposable implements ICoreComponent 
     container: HTMLElement = this.element,
   ): Array<T> {
     return Array.from(container.querySelectorAll(selector));
-  }
-
-  dispose() {
-    this.element = null;
-
-    super.dispose();
   }
 }

@@ -1,3 +1,5 @@
+import ICoreComponent from '../interface/ICoreComponent';
+
 export type StoredComponentInstance = {
   instance: any;
   element: HTMLElement;
@@ -5,6 +7,7 @@ export type StoredComponentInstance = {
 
 export type ComponentModule = {
   displayName: string;
+  new (element: HTMLElement): ICoreComponent;
 };
 
 // store instances
@@ -41,7 +44,7 @@ export function registerComponent(component: ComponentModule) {
  *
  * @param component A reference to the component constructor function
  */
-export function updateComponent(component): void {
+export function updateComponent(component: ComponentModule): void {
   const BlockConstructor = component;
   const displayName = BlockConstructor.displayName;
 
@@ -78,7 +81,7 @@ export function setComponentInstance(
 export function removeComponentByElement(
   displayName: string,
   element: HTMLElement,
-): StoredComponentInstance {
+): StoredComponentInstance | null {
   const itemIndex = getComponentInstances(displayName).findIndex(c => c.element === element);
   if (itemIndex !== -1) {
     return componentInstances[displayName].splice(itemIndex, 1)[0];

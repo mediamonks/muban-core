@@ -99,7 +99,9 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
+    "@types/loader-utils": "^1.1.3",
     "@babel/runtime": "^7.0.0-beta.35",
+    "@types/webpack-env": "^1.13.6",
     "loader-utils": "^1.1.0",
     "seng-disposable": "^1.1.3"
   }

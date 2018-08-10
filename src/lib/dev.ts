@@ -7,12 +7,26 @@ import path from 'path';
 import cleanElement from './utils/cleanElement';
 import initComponents from './utils/initComponents';
 import { waitForLoadedStyleSheets } from './utils/waitForStyleSheetsLoaded';
-import { getChanged, getModuleContext } from './utils/webpackUtils';
+import { getChanged, getModuleContext, ModuleMap } from './utils/webpackUtils';
 
-let indexTemplate;
-let appTemplate;
+type Renderer = (update?: boolean) => void;
+type Template = (data: any) => string;
+type Page = {
+  page: string;
+  data: any;
+  link: string;
+};
 
-function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate, onBeforeInit) {
+let indexTemplate: Template;
+let appTemplate: Template;
+
+function createIndexRenderer(
+  appRoot: HTMLElement,
+  jsonModules: ModuleMap,
+  onInit?: () => void,
+  onUpdate?: () => void,
+  onBeforeInit?: () => void,
+): Renderer {
   return update => {
     const pages = Object.keys(jsonModules)
       .map(key => {
@@ -36,13 +50,13 @@ function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate, onBeforeIni
         }
         return String(a.data.meta.id || a.page).localeCompare(String(b.data.meta.id || b.page));
       })
-      .map(({ page, data }) => ({
+      .map<Page>(({ page, data }) => ({
         page,
         data,
         link: `${page}.html`,
       }));
 
-    const categoryMap = pages.reduce((cats, page) => {
+    const categoryMap = pages.reduce<{ [category: string]: Array<Page> }>((cats, page) => {
       const category = page.data.meta.category || 'default';
       if (!cats[category]) {
         cats[category] = [];
@@ -74,7 +88,14 @@ function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate, onBeforeIni
   };
 }
 
-function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate, onBeforeInit) {
+function createPageRenderer(
+  appRoot: HTMLElement,
+  jsonModules: ModuleMap,
+  pageName: string,
+  onInit?: () => void,
+  onUpdate?: () => void,
+  onBeforeInit?: () => void,
+): Renderer {
   return update => {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
@@ -96,9 +117,15 @@ function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate, on
   };
 }
 
-function registerComponent(path, content, options) {
-  const map = options.registerPartialMap || [
-    path => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
+function registerComponent(path: string, content: any, options: BootstrapOptions) {
+  const map: Array<(path: string) => string | null> = options.registerPartialMap || [
+    path => {
+      if (path.includes('/block/')) {
+        const match = /\/([^/]+)\.hbs/gi.exec(path);
+        return match && match[1];
+      }
+      return null;
+    },
   ];
   let res;
   map.some(x => {
@@ -125,7 +152,7 @@ export type BootstrapOptions = {
 
 export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   // Get info for current page
-  let pageName;
+  let pageName: string;
   if (options.pageName) {
     pageName = options.pageName;
   } else {
@@ -136,7 +163,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   indexTemplate = options.indexTemplate;
   appTemplate = options.appTemplate;
 
-  let renderer;
+  let renderer: Renderer;
 
   const update = () => {
     cleanElement(appRoot);
@@ -172,7 +199,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   });
 
   return {
-    updateData(changedContext) {
+    updateData(changedContext: __WebpackModuleApi.RequireContext) {
       const changedModules = getChanged(changedContext, jsonModules);
 
       // only re-render if the current page data is changed
@@ -185,7 +212,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       }
     },
 
-    updatePartials(changedContext) {
+    updatePartials(changedContext: __WebpackModuleApi.RequireContext) {
       // You can't use the previous context here. You _need_ to call require.context again to
       // get the new version. Otherwise you might get errors about using disposed modules
       const changedModules = getChanged(changedContext, partialModules);
@@ -197,7 +224,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       update();
     },
 
-    update(updatedIndexTemplate, updatedAppTemplate) {
+    update(updatedIndexTemplate: Template, updatedAppTemplate: Template) {
       indexTemplate = updatedIndexTemplate;
       appTemplate = updatedAppTemplate;
 

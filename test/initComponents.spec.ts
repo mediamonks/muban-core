@@ -27,7 +27,7 @@ describe('initComponents', () => {
         adoptSpy('foo');
       }
     };
-    registerComponent(foo);
+    registerComponent(<any> foo);
 
     const bar = class Bar {
       static displayName: string = 'bar';
@@ -42,7 +42,7 @@ describe('initComponents', () => {
         adoptSpy('bar');
       }
     };
-    registerComponent(bar);
+    registerComponent(<any> bar);
 
     const div = createHTML(`
       <div>
@@ -69,7 +69,7 @@ describe('initComponents', () => {
       </div>
     `);
 
-    div.querySelector('.container').appendChild(inner);
+    div.querySelector('.container')!.appendChild(inner);
 
     initComponents(inner);
 

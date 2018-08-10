@@ -23,5 +23,5 @@ export default function cleanElement(element: HTMLElement): void {
   }
 
   // call recursively on all child data-components
-  Array.from(element.querySelectorAll('[data-component]')).forEach(cleanElement);
+  Array.from(element.querySelectorAll<HTMLElement>('[data-component]')).forEach(cleanElement);
 }

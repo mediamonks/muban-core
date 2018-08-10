@@ -10,7 +10,7 @@ interface ICoreComponent extends IDisposable {
    * @param {HTMLElement} container
    * @returns {HTMLElement}
    */
-  getElement<T extends Element = HTMLElement>(selector: string, container?: HTMLElement): T;
+  getElement<T extends Element = HTMLElement>(selector: string, container?: HTMLElement): T | null;
 
   /**
    * @public
@@ -20,6 +20,8 @@ interface ICoreComponent extends IDisposable {
    * @returns {Array<HTMLElement>}
    */
   getElements<T extends Element = HTMLElement>(selector: string, container?: HTMLElement): Array<T>;
+
+  adopted?: () => void;
 }
 
 export default ICoreComponent;
