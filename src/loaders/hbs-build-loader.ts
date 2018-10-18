@@ -49,7 +49,7 @@ function extractIncludes(content) {
   const styles = [];
 
   let strippedContent = content.replace(
-    /<script src=\\["']([^"']+)\\["']><\/script>[\\r\\n]*/gi,
+    /<script[\\s]src=\\["']([^"']+)\\["']><\/script>[\\r\\n]*/gi,
     (_, match) => {
       scripts.push(match);
       return '';
@@ -57,7 +57,7 @@ function extractIncludes(content) {
   );
 
   strippedContent = strippedContent.replace(
-    /<link rel=\\["']stylesheet\\["'] href=\\["']([^"']+)\\["']>[\\r\\n]*/gi,
+    /<link[\\s]rel=\\["']stylesheet\\["'][\\s]href=\\["']([^"']+)\\["']>[\\r\\n]*/gi,
     (_, match) => {
       styles.push(match);
       return '';
