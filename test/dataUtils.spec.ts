@@ -1,10 +1,12 @@
+/* tslint:disable no-function-constructor-with-string-args */
+/* eslint-disable no-new-func, class-methods-use-this */
 import { expect, use } from 'chai';
-import fs from "fs";
-import path from "path";
-import Handlebars from "handlebars";
+import fs from 'fs';
+import path from 'path';
+import Handlebars from 'handlebars';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
-import {renderItem, renderItems} from '../src/lib/utils/dataUtils';
+import { renderItem, renderItems } from '../src/lib/utils/dataUtils';
 
 import initComponents from '../src/lib/utils/initComponents';
 import { registerComponent } from '../src/lib/utils/componentStore';
@@ -15,8 +17,11 @@ use(sinonChai);
 describe('dataUtils', () => {
   describe('renderItem', () => {
     it('should replace an item', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -24,7 +29,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -55,7 +60,7 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'});
+      const item = renderItem<HTMLDivElement>(div, template, { text: 'foobar' });
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
@@ -67,8 +72,11 @@ describe('dataUtils', () => {
     });
 
     it('should append an item', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -76,7 +84,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -107,7 +115,7 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'}, true);
+      const item = renderItem<HTMLDivElement>(div, template, { text: 'foobar' }, true);
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
@@ -119,11 +127,13 @@ describe('dataUtils', () => {
     });
   });
 
-
   describe('renderItems', () => {
     it('should replace a items', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -131,7 +141,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -162,7 +172,10 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}]);
+      const items = renderItems<HTMLDivElement>(div, template, [
+        { text: 'foobar' },
+        { text: 'baz' },
+      ]);
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
@@ -174,8 +187,11 @@ describe('dataUtils', () => {
     });
 
     it('should append items', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -183,7 +199,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -214,7 +230,12 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}], true);
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        [{ text: 'foobar' }, { text: 'baz' }],
+        true,
+      );
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
