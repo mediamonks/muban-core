@@ -2,7 +2,8 @@
   "presets": [
     ["@babel/env", {
       "targets": {
-        "node": "8"
+        "browsers": ["last 2 versions"],
+        "node": "6"
       },
       "loose": true,
       "useBuiltIns": false
@@ -14,7 +15,7 @@
     ["@babel/plugin-transform-runtime", {
       "helpers": true,
       "polyfill": false,
-      "regenerator": false,
+      "regenerator": true,
       "moduleName": "@babel/runtime"
     }]
   ],
