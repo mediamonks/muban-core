@@ -58,9 +58,16 @@ describe('initComponents', () => {
 
     initComponents(div);
 
+    // should have been called twice
     expect(mountSpy).to.have.been.calledTwice;
     expect(adoptSpy).to.have.been.calledTwice;
+
+    // should have called mounted before adopted
     expect(mountSpy).to.have.been.calledBefore(adoptSpy);
+
+    // should have called bar before foo
+    expect(mountSpy.args).to.deep.equals([ [ 'bar' ], [ 'foo' ] ]);
+
 
     const inner = createHTML(`
       <div>
