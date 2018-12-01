@@ -15,10 +15,10 @@ export type ComponentModule = {
  * Maybe there is a better way to 'globally'
  * share info between entries
  */
-type ComponentInstances = {
+export type ComponentInstances = {
   [key: string]: Array<StoredComponentInstance>;
 };
-type ComponentModules = Array<ComponentModule>;
+export type ComponentModules = Array<ComponentModule>;
 
 // store instances
 const componentInstances: ComponentInstances = {};
