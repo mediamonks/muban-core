@@ -39,7 +39,7 @@ declare global {
 
 if (typeof window !== 'undefined') {
   window.__muban_core__ = window.__muban_core__ || {};
-  window.__muban_core__.store = {
+  window.__muban_core__.store = window.__muban_core__.store || {
     componentInstances,
     componentModules,
   };

@@ -1,6 +1,6 @@
 {
   "name": "muban-core",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "The core library and webpack loaders for Muban",
   "main": "./index.js",
   "types": "./index.d.ts",
