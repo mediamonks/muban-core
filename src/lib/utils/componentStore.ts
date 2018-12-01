@@ -7,13 +7,69 @@ export type ComponentModule = {
   displayName: string;
 };
 
-// store instances
-const componentInstances: {
+/***********************************************
+ * Store components and instanced on the Window,
+ * because webpack can't re-use the same module
+ * between different entry files.
+ *
+ * Maybe there is a better way to 'globally'
+ * share info between entries
+ */
+type ComponentInstances = {
   [key: string]: Array<StoredComponentInstance>;
-} = {};
+};
+type ComponentModules = Array<ComponentModule>;
+
+// store instances
+const componentInstances: ComponentInstances = {};
 
 // store constructors
-let componentModules: Array<ComponentModule> = [];
+let componentModules: ComponentModules = [];
+
+declare global {
+  interface Window {
+    __muban_core__: {
+      store?: {
+        componentInstances?: ComponentInstances;
+        componentModules?: ComponentModules;
+      };
+    };
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.__muban_core__ = window.__muban_core__ || {};
+  window.__muban_core__.store = {
+    componentInstances,
+    componentModules,
+  };
+}
+
+function getLocalComponentInstances(): ComponentInstances {
+  if (typeof window !== 'undefined') {
+    return window.__muban_core__.store.componentInstances;
+  }
+  return componentInstances;
+}
+
+function getLocalComponentModules(): ComponentModules {
+  if (typeof window !== 'undefined') {
+    return window.__muban_core__.store.componentModules;
+  }
+  return componentModules;
+}
+
+function setLocalComponentModules(modules: ComponentModules): void {
+  if (typeof window !== 'undefined') {
+    window.__muban_core__.store.componentModules = modules;
+  } else {
+    componentModules = modules;
+  }
+}
+
+/*
+ * End global storage hack
+ ************************/
 
 /**
  * Registers a component class to be initialized later for each DOM element matching the
@@ -26,8 +82,10 @@ let componentModules: Array<ComponentModule> = [];
 export function registerComponent(component: ComponentModule) {
   if (component.displayName) {
     // remove old instance before adding the new one
-    componentModules = componentModules.filter(c => c.displayName !== component.displayName);
-    componentModules.push(component);
+    setLocalComponentModules(
+      getLocalComponentModules().filter(c => c.displayName !== component.displayName),
+    );
+    getLocalComponentModules().push(component);
   } else {
     // tslint:disable-next-line no-console
     console.error('missing "block" definition on component', component);
@@ -53,26 +111,26 @@ export function updateComponent(component): void {
 }
 
 export function getComponents(): Array<ComponentModule> {
-  return componentModules;
+  return getLocalComponentModules();
 }
 
 export function getComponentInstances(displayName: string): Array<StoredComponentInstance> {
-  return componentInstances[displayName] || [];
+  return getLocalComponentInstances()[displayName] || [];
 }
 
 export function hasComponentInstance(displayName: string): boolean {
-  return displayName in componentInstances;
+  return displayName in getLocalComponentInstances();
 }
 
 export function setComponentInstance(
   displayName: string,
   component: StoredComponentInstance,
 ): void {
-  if (!componentInstances[displayName]) {
-    componentInstances[displayName] = [];
+  if (!getLocalComponentInstances()[displayName]) {
+    getLocalComponentInstances()[displayName] = [];
   }
 
-  componentInstances[displayName].push(component);
+  getLocalComponentInstances()[displayName].push(component);
 }
 
 export function removeComponentByElement(
