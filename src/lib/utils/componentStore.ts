@@ -139,7 +139,7 @@ export function removeComponentByElement(
 ): StoredComponentInstance {
   const itemIndex = getComponentInstances(displayName).findIndex(c => c.element === element);
   if (itemIndex !== -1) {
-    return componentInstances[displayName].splice(itemIndex, 1)[0];
+    return getLocalComponentInstances()[displayName].splice(itemIndex, 1)[0];
   }
   return null;
 }

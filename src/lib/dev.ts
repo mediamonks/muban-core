@@ -2,123 +2,23 @@
  * This file is only used during development.
  * It's set up to render the hbs templates in the DOM using javascript, and supports hot reloading.
  */
-import 'modernizr';
-import path from 'path';
 import cleanElement from './utils/cleanElement';
-import initComponents from './utils/initComponents';
-import { waitForLoadedStyleSheets } from './utils/waitForStyleSheetsLoaded';
 import { getChanged, getModuleContext } from './utils/webpackUtils';
+import createIndexRenderer from './dev-utils/createIndexRenderer';
+import createPageRenderer, { PageRenderOptions } from './dev-utils/createPageRenderer';
+import registerComponent from './dev-utils/registerComponent';
 
 let indexTemplate;
 let appTemplate;
 
-function createIndexRenderer(appRoot, jsonModules, onInit, onUpdate, onBeforeInit) {
-  return update => {
-    const pages = Object.keys(jsonModules)
-      .map(key => {
-        const item = {
-          page: path.basename(key, `.${key.split('.').pop()}`),
-          data: jsonModules[key],
-        };
-        if (!item.data.meta) {
-          item.data.meta = {};
-        }
-        if (item.page.includes('.')) {
-          item.data.meta.alt = true;
-        }
-        return item;
-      })
-      .sort((a, b) => {
-        if (a.data.meta.alt || b.data.meta.alt) {
-          // sort on alt
-          if (a.page.startsWith(b.page)) return 1;
-          if (b.page.startsWith(a.page)) return -1;
-        }
-        return String(a.data.meta.id || a.page).localeCompare(String(b.data.meta.id || b.page));
-      })
-      .map(({ page, data }) => ({
-        page,
-        data,
-        link: `${page}.html`,
-      }));
-
-    const categoryMap = pages.reduce((cats, page) => {
-      const category = page.data.meta.category || 'default';
-      if (!cats[category]) {
-        cats[category] = [];
-      }
-      cats[category].push(page);
-      return cats;
-    }, {});
-
-    const categories = Object.keys(categoryMap).map(key => ({
-      name: key,
-      pages: categoryMap[key],
-    }));
-
-    waitForLoadedStyleSheets(document).then(() => {
-      appRoot.innerHTML = indexTemplate({
-        pages,
-        categories,
-        showCategories: categories.length > 1,
-      });
-
-      if (!update) {
-        onBeforeInit && onBeforeInit();
-      }
-
-      initComponents(appRoot);
-
-      update ? onUpdate && onUpdate() : onInit && onInit();
-    });
-  };
-}
-
-function createPageRenderer(appRoot, jsonModules, pageName, onInit, onUpdate, onBeforeInit) {
-  return update => {
-    // giving the browser some time to inject the styles
-    // so when components are constructed, the styles are all applied
-    waitForLoadedStyleSheets(document).then(() => {
-      // render page with data
-      appRoot.innerHTML = appTemplate(
-        jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`],
-      );
-
-      if (!update) {
-        onBeforeInit && onBeforeInit();
-      }
-
-      // init components
-      initComponents(appRoot);
-
-      update ? onUpdate && onUpdate() : onInit && onInit();
-    });
-  };
-}
-
-function registerComponent(path, content, options) {
-  const map = options.registerPartialMap || [
-    path => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
-  ];
-  let res;
-  map.some(x => {
-    if ((res = x(path))) {
-      options.Handlebars.registerPartial(res, content);
-    }
-    // if we have one match, ignore the others, otherwise we might register a component twice
-    return !!res;
-  });
-}
-
-export type BootstrapOptions = {
-  indexTemplate: any;
-  appTemplate: any;
+export type BootstrapOptions = Partial<
+  Pick<PageRenderOptions, 'onInit' | 'onUpdate' | 'onData' | 'onBeforeInit'>
+> & {
+  indexTemplate: (data: any) => string;
+  appTemplate: (data: any) => string;
   dataContext: any;
   partialsContext: any;
   Handlebars: any;
-  onBeforeInit?: () => void;
-  onInit?: () => void;
-  onUpdate?: () => void;
   registerPartialMap?: Array<(path: string) => string | null>;
   pageName?: string;
 };
@@ -148,23 +48,23 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
     registerComponent(key, module, options);
   });
 
+  const renderOptions = {
+    appRoot,
+    jsonModules,
+    onInit: options.onInit,
+    onUpdate: options.onUpdate,
+    onBeforeInit: options.onBeforeInit,
+  };
+
   if (pageName === 'index') {
-    renderer = createIndexRenderer(
-      appRoot,
-      jsonModules,
-      options.onInit,
-      options.onUpdate,
-      options.onBeforeInit,
-    );
+    renderer = createIndexRenderer({ ...renderOptions, template: indexTemplate });
   } else {
-    renderer = createPageRenderer(
-      appRoot,
-      jsonModules,
+    renderer = createPageRenderer({
+      ...renderOptions,
       pageName,
-      options.onInit,
-      options.onUpdate,
-      options.onBeforeInit,
-    );
+      template: appTemplate,
+      onData: options.onData,
+    });
   }
 
   document.addEventListener('DOMContentLoaded', () => {
