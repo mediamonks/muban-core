@@ -5,17 +5,25 @@ export const waitForLoadedStyleSheets = document =>
     );
 
     let allLoaded = false;
-    const checkAllLoaded = () => {
-      if (!allLoaded && document.styleSheets.length >= links.length) {
+    let loadedCount = 0;
+    const checkAllLoaded = (initial = false) => {
+      // initially, check stylesheets in the DOM, otherwise, check loaded count
+      if (
+        !allLoaded &&
+        ((initial && document.styleSheets.length >= links.length) ||
+          (!initial && loadedCount >= links.length))
+      ) {
         allLoaded = true;
         resolve();
       }
     };
-    checkAllLoaded();
+
+    checkAllLoaded(true);
 
     if (!allLoaded) {
       links.forEach(stylesheet => {
         stylesheet.onload = () => {
+          ++loadedCount;
           checkAllLoaded();
         };
       });
