@@ -21,7 +21,16 @@ export default function createPageRenderer({
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
     waitForLoadedStyleSheets(document).then(() => {
-      const data = jsonModules[`./${pageName}.yaml`] || jsonModules[`./${pageName}.json`];
+      const dataFileName = Object.keys(jsonModules).find(key =>
+        new RegExp(`[\\/\\\\]${pageName}\\.`).test(key),
+      );
+      let data;
+      if (dataFileName) {
+        data = jsonModules[dataFileName];
+      } else {
+        /* tslint:disable-next-line no-console */
+        console.info(`Data for page "${pageName}" could not be found.`);
+      }
       // render page with data
       appRoot.innerHTML = template(onData ? onData(data, pageName) || {} : data);
 

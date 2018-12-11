@@ -76,11 +76,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       const changedModules = getChanged(changedContext, jsonModules);
 
       // only re-render if the current page data is changed
-      if (
-        changedModules.some(
-          ({ key }) => key === `./${pageName}.yaml` || key === `./${pageName}.json`,
-        )
-      ) {
+      if (changedModules.some(({ key }) => new RegExp(`[\\/\\\\]${pageName}\\.`).test(key))) {
         update();
       }
     },
