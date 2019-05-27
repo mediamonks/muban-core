@@ -83,7 +83,7 @@ describe('dev', () => {
         onRenderSpy(data);
         return data.toString()
       },
-      pageName: 'index',
+      pageName: 'listing',
     });
     document.dispatchEvent(new Event('DOMContentLoaded'));
 

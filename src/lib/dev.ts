@@ -30,7 +30,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
     pageName = options.pageName;
   } else {
     const pageMatch = /\/(.*)\.html/i.exec(document.location.pathname);
-    pageName = (pageMatch && pageMatch[1]) || 'index';
+    pageName = (pageMatch && pageMatch[1]) || 'listing';
   }
 
   indexTemplate = options.indexTemplate;
@@ -56,7 +56,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
     onBeforeInit: options.onBeforeInit,
   };
 
-  if (pageName === 'index') {
+  if (pageName === 'listing') {
     renderer = createIndexRenderer({ ...renderOptions, template: indexTemplate });
   } else {
     renderer = createPageRenderer({
