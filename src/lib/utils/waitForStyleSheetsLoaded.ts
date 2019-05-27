@@ -13,7 +13,7 @@ export const waitForLoadedStyleSheets = (document, dev = false) =>
     let allLoaded = false;
     let loadedCount = 0;
     const checkAllLoaded = (initial = false) => {
-      const sheets = document.styleSheets.filter(
+      const sheets = Array.from<StyleSheet>(document.styleSheets).filter(
         s => !dev || (s.href && s.href.startsWith('blob:')),
       );
 
