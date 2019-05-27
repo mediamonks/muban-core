@@ -29,7 +29,7 @@ export default function createIndexRenderer({
       pages: categoryMap[key],
     }));
 
-    waitForLoadedStyleSheets(document).then(() => {
+    waitForLoadedStyleSheets(document, true).then(() => {
       appRoot.innerHTML = template({
         pages,
         categories,

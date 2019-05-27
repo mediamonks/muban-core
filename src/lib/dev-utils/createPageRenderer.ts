@@ -20,7 +20,7 @@ export default function createPageRenderer({
   return update => {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
-    waitForLoadedStyleSheets(document).then(() => {
+    waitForLoadedStyleSheets(document, true).then(() => {
       const dataFileName = Object.keys(jsonModules).find(key =>
         new RegExp(`[\\/\\\\]${pageName}\\.`).test(key),
       );
