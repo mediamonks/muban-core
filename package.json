@@ -82,7 +82,7 @@
     "eslint-plugin-chai-friendly": "^0.4.1",
     "eslint-plugin-import": "^2.8.0",
     "eslint-plugin-prettier": "^2.4.0",
-    "handlebars": "^4.0.11",
+    "handlebars": "^4.1.2",
     "husky": "^0.14.3",
     "jsdom": "^11.5.1",
     "jsdom-global": "^3.0.2",
@@ -100,7 +100,7 @@
     "tslint": "^5.8.0",
     "tslint-config-airbnb": "^5.4.2",
     "tslint-config-prettier": "^1.6.0",
-    "typedoc": "^0.9.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.2.1",
     "webpack": "^4.26.1"
   },
