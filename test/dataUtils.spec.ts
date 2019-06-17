@@ -128,7 +128,7 @@ describe('dataUtils', () => {
   });
 
   describe('renderItems', () => {
-    it('should replace a items', () => {
+    it('should replace all items', () => {
       const compiled: any = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
@@ -245,5 +245,77 @@ describe('dataUtils', () => {
 
       expect(fooCount).to.equal(4);
     });
+
+    it('should replace all items, each with provided wrapper element', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
+      const template = Handlebars.template(compiled);
+
+      const mountSpy = spy();
+      const adoptSpy = spy();
+      const destructSpy = spy();
+
+      const foo = class Foo {
+        static displayName: string = 'foo';
+
+        constructor() {
+          // dom ready
+          mountSpy('foo');
+        }
+
+        adopted() {
+          // fully adopted in tree
+          adoptSpy('foo');
+        }
+
+        dispose() {
+          destructSpy('foo');
+        }
+      };
+      registerComponent(foo);
+
+      const div = createHTML(`
+        <div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+        </div>
+      `);
+
+      initComponents(div);
+
+      const wrapperElement = createHTML('<div data-wrapper="bar"></div>');
+      
+      const data = [
+        { text: 'foobar' },
+        { text: 'baz' },
+      ];
+
+      const items = renderItems<HTMLDivElement>(
+        div, 
+        template, 
+        data,
+        false, 
+        wrapperElement
+      );
+
+      expect(mountSpy).to.have.been.callCount(4);
+      expect(adoptSpy).to.have.been.callCount(4);
+      expect(items.length).to.equal(2);
+
+      const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
+      
+      expect(wrapperCount).to.equal(2);
+    })
   });
 });

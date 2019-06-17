@@ -15,8 +15,23 @@ export function renderItems<T extends Element = HTMLElement>(
   template: (data?: any) => string,
   data: Array<any>,
   append: boolean = false,
+  listElementWrapper?: HTMLElement,
 ) {
-  return render<T>(container, append, () => data.reduce((html, d) => html + template(d), ''));
+  let generateStringTemplate;
+  if (listElementWrapper) {
+    generateStringTemplate = () =>
+      data.reduce((html, d) => {
+        const templateHtml = <HTMLElement>listElementWrapper.cloneNode(true);
+        templateHtml.innerHTML = template(d);
+        const templateString = templateHtml.outerHTML;
+
+        return html + templateString;
+      }, '');
+  } else {
+    generateStringTemplate = () => data.reduce((html, d) => html + template(d), '');
+  }
+
+  return render<T>(container, append, generateStringTemplate);
 }
 
 function render<T extends Element = HTMLElement>(
