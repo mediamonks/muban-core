@@ -299,6 +299,7 @@ describe('dataUtils', () => {
       const data = [
         { text: 'foobar' },
         { text: 'baz' },
+        { text: 'ipsum'}
       ];
 
       const items = renderItems<HTMLDivElement>(
@@ -309,13 +310,13 @@ describe('dataUtils', () => {
         wrapperElement
       );
 
-      expect(mountSpy).to.have.been.callCount(4);
-      expect(adoptSpy).to.have.been.callCount(4);
-      expect(items.length).to.equal(2);
+      expect(mountSpy).to.have.been.callCount(5);
+      expect(adoptSpy).to.have.been.callCount(5);
+      expect(items.length).to.equal(3);
 
       const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
       
-      expect(wrapperCount).to.equal(2);
+      expect(wrapperCount).to.equal(3);
     })
   });
 });
