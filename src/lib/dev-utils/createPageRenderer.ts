@@ -31,6 +31,10 @@ export default function createPageRenderer({
         /* tslint:disable-next-line no-console */
         console.info(`Data for page "${pageName}" could not be found.`);
       }
+      // execute when exported as js function
+      if (typeof data === 'function') {
+        data = data();
+      }
       // render page with data
       appRoot.innerHTML = template(onData ? onData(data, pageName) || {} : data);
 

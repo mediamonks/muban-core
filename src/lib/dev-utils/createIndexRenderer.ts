@@ -54,6 +54,11 @@ function getPages(jsonModules: { [key: string]: any }) {
         page: path.basename(key, `.${key.split('.').pop()}`),
         data: jsonModules[key],
       };
+      // execute when exported as js function
+      if (typeof item.data === 'function') {
+        item.data = item.data();
+      }
+
       if (!item.data.meta) {
         item.data.meta = {};
       }
