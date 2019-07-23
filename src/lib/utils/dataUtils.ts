@@ -39,8 +39,16 @@ export function renderItems<T extends Element = HTMLElement>(
 
 function createHtml(innerHtml: string, container?: HTMLElement) {
   const div = container ? container : document.createElement('div');
-  div.innerHTML = innerHtml;
+  appendToDeepestNode(innerHtml, div);
   return div;
+}
+
+function appendToDeepestNode(innerHtml: string, element: HTMLElement): HTMLElement {
+  if (!element.firstElementChild) {
+    element.innerHTML = innerHtml;
+    return element;
+  }
+  return appendToDeepestNode(innerHtml, <HTMLElement>element.firstElementChild);
 }
 
 function render<T extends Element = HTMLElement>(

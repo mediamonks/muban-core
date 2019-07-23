@@ -366,7 +366,6 @@ describe('dataUtils', () => {
         { text: 'baz' },
         { text: 'ipsum'}
       ];
-
       const items = renderItems<HTMLDivElement>(
         div,
         template,
@@ -381,6 +380,85 @@ describe('dataUtils', () => {
 
       const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
       expect(wrapperCount).to.equal(5);
+    });
+
+    it('should append items with nested wrapper element', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
+      const template = Handlebars.template(compiled);
+
+      const mountSpy = spy();
+      const adoptSpy = spy();
+      const destructSpy = spy();
+
+      const foo = class Foo {
+        static displayName: string = 'foo';
+
+        constructor() {
+          // dom ready
+          mountSpy('foo');
+        }
+
+        adopted() {
+          // fully adopted in tree
+          adoptSpy('foo');
+        }
+
+        dispose() {
+          destructSpy('foo');
+        }
+      };
+      registerComponent(foo);
+
+      const div = createHTML(`
+        <div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+        </div>
+      `);
+
+      initComponents(div);
+
+      const wrapperElement = createHTML(`
+        <div data-wrapper="bar">
+          <span data-wrapper="bar-inner"></span>
+        </div>
+      `);
+      const data = [
+        { text: 'foobar' },
+        { text: 'baz' },
+        { text: 'ipsum'}
+      ];
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        data,
+        true,
+        wrapperElement
+      );
+
+      expect(mountSpy).to.have.been.callCount(5);
+      expect(adoptSpy).to.have.been.callCount(5);
+      expect(items.length).to.equal(3);
+
+      const wrapperElements = div.querySelectorAll('[data-wrapper="bar-inner"]');
+      expect(wrapperElements.length).to.equal(3);
+
+      wrapperElements.forEach(element => {
+        const childrenCount = element.children.length;
+        expect(childrenCount).to.equal(1);
+      })
     });
   });
 });
