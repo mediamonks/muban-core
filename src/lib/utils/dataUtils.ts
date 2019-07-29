@@ -17,16 +17,16 @@ export function renderItems<T extends Element = HTMLElement>(
   append: boolean = false,
   listElementWrapper?: HTMLElement,
 ) {
-  let generateStringTemplate;
+  let generateStringTemplate: () => HTMLElement | DocumentFragment;
   if (listElementWrapper) {
     generateStringTemplate = () => {
-      return data.reduce((html, d) => {
+      return data.reduce<DocumentFragment>((tempContainer, d) => {
         const templateHtml = createHtml(template(d), <HTMLElement>listElementWrapper.cloneNode(
           true,
         ));
-        html.appendChild(templateHtml);
-        return html;
-      }, document.createElement('div'));
+        tempContainer.appendChild(templateHtml);
+        return tempContainer;
+      }, document.createDocumentFragment());
     };
   } else {
     generateStringTemplate = () => {
@@ -54,7 +54,7 @@ function appendToDeepestNode(innerHtml: string, element: HTMLElement): HTMLEleme
 function render<T extends Element = HTMLElement>(
   container: HTMLElement,
   append: boolean,
-  getHtml: () => HTMLElement,
+  getHtml: () => HTMLElement | DocumentFragment,
 ): Array<T> {
   if (!append) {
     // dispose all created component instances
