@@ -17,7 +17,7 @@ export default function cleanElement(element: HTMLElement): void {
   // find instance linked to element and clean up
   if (displayName && hasComponentInstance(displayName)) {
     const removedComponent = removeComponentByElement(displayName, element);
-    if (removedComponent) {
+    if (removedComponent && removedComponent.instance && removedComponent.instance.dispose) {
       removedComponent.instance.dispose();
     }
   }
