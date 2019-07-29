@@ -7,7 +7,7 @@ export function renderItem<T extends Element = HTMLElement>(
   data: any,
   append: boolean = false,
 ): T {
-  return render<T>(container, append, () => template(data))[0];
+  return render<T>(container, append, () => createHtml(template(data)))[0];
 }
 
 export function renderItems<T extends Element = HTMLElement>(
@@ -15,14 +15,46 @@ export function renderItems<T extends Element = HTMLElement>(
   template: (data?: any) => string,
   data: Array<any>,
   append: boolean = false,
+  listElementWrapper?: HTMLElement,
 ) {
-  return render<T>(container, append, () => data.reduce((html, d) => html + template(d), ''));
+  let generateStringTemplate: () => HTMLElement | DocumentFragment;
+  if (listElementWrapper) {
+    generateStringTemplate = () => {
+      return data.reduce<DocumentFragment>((tempContainer, d) => {
+        const templateHtml = createHtml(template(d), <HTMLElement>listElementWrapper.cloneNode(
+          true,
+        ));
+        tempContainer.appendChild(templateHtml);
+        return tempContainer;
+      }, document.createDocumentFragment());
+    };
+  } else {
+    generateStringTemplate = () => {
+      const innerHtml = data.reduce((html, d) => html + template(d), '');
+      return createHtml(innerHtml);
+    };
+  }
+  return render<T>(container, append, generateStringTemplate);
+}
+
+function createHtml(innerHtml: string, container?: HTMLElement) {
+  const div = container ? container : document.createElement('div');
+  appendToDeepestNode(innerHtml, div);
+  return div;
+}
+
+function appendToDeepestNode(innerHtml: string, element: HTMLElement): HTMLElement {
+  if (!element.firstElementChild) {
+    element.innerHTML = innerHtml;
+    return element;
+  }
+  return appendToDeepestNode(innerHtml, <HTMLElement>element.firstElementChild);
 }
 
 function render<T extends Element = HTMLElement>(
   container: HTMLElement,
   append: boolean,
-  getHtml: () => string,
+  getHtml: () => HTMLElement | DocumentFragment,
 ): Array<T> {
   if (!append) {
     // dispose all created component instances
@@ -31,12 +63,9 @@ function render<T extends Element = HTMLElement>(
       container.removeChild(container.children[0]);
     }
   }
-
   const fragment = document.createDocumentFragment();
-  const div = document.createElement('div');
-  div.innerHTML = getHtml();
+  const children = <Array<T>>Array.from(getHtml().children);
 
-  const children = <Array<T>>Array.from(div.children);
   for (const child of children) {
     fragment.appendChild(child);
   }
