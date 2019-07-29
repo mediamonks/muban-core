@@ -64,6 +64,7 @@ describe('dataUtils', () => {
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(destructSpy).to.have.been.calledTwice;
       expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
@@ -119,6 +120,7 @@ describe('dataUtils', () => {
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(destructSpy).to.have.not.been.called;
       expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
@@ -180,6 +182,7 @@ describe('dataUtils', () => {
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
+      expect(destructSpy).to.have.been.callCount(2);
       expect(items.length).to.equal(2);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
@@ -197,7 +200,6 @@ describe('dataUtils', () => {
 
       const mountSpy = spy();
       const adoptSpy = spy();
-      const destructSpy = spy();
 
       const foo = class Foo {
         static displayName: string = 'foo';
@@ -210,10 +212,6 @@ describe('dataUtils', () => {
         adopted() {
           // fully adopted in tree
           adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
         }
       };
       registerComponent(foo);
@@ -305,6 +303,7 @@ describe('dataUtils', () => {
       );
 
       expect(mountSpy).to.have.been.callCount(5);
+      expect(destructSpy).to.have.been.callCount(2);
       expect(items.length).to.equal(3);
 
       const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
@@ -321,8 +320,6 @@ describe('dataUtils', () => {
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
-      const adoptSpy = spy();
-      const destructSpy = spy();
 
       const foo = class Foo {
         static displayName: string = 'foo';
@@ -330,15 +327,6 @@ describe('dataUtils', () => {
         constructor() {
           // dom ready
           mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
         }
       };
       registerComponent(foo);
@@ -375,7 +363,6 @@ describe('dataUtils', () => {
       );
 
       expect(mountSpy).to.have.been.callCount(5);
-      expect(adoptSpy).to.have.been.callCount(5);
       expect(items.length).to.equal(3);
 
       const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
@@ -391,24 +378,12 @@ describe('dataUtils', () => {
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
-      const adoptSpy = spy();
-      const destructSpy = spy();
 
       const foo = class Foo {
         static displayName: string = 'foo';
 
         constructor() {
-          // dom ready
           mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
         }
       };
       registerComponent(foo);
@@ -449,7 +424,6 @@ describe('dataUtils', () => {
       );
 
       expect(mountSpy).to.have.been.callCount(5);
-      expect(adoptSpy).to.have.been.callCount(5);
       expect(items.length).to.equal(3);
 
       const wrapperElements = div.querySelectorAll('[data-wrapper="bar-inner"]');
