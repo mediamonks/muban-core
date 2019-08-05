@@ -10,29 +10,45 @@ export const waitForLoadedStyleSheets = (document, dev = false) =>
       document.querySelectorAll('link[rel=stylesheet]'),
     ).filter(l => !dev || (l.href && l.href.startsWith('blob:')));
 
-    let allLoaded = false;
-    let loadedCount = 0;
-    const checkAllLoaded = (initial = false) => {
-      const sheets = Array.from<StyleSheet>(document.styleSheets).filter(
-        s => !dev || (s.href && s.href.startsWith('blob:')),
-      );
+    // tslint:disable:no-console
+    // console.info('[WFSSL]');
+    // console.info('[WFSSL] ---- init ----');
+    // console.info('[WFSSL] links: ', links.length);
+    // console.info('[WFSSL] links: \n\t', links.map(l => `${l.href} -- ${l.href.substr(-3)} - ${l.sheet}`).join('\n\t '));
+    // tslint:enable:no-console
 
-      // initially, check stylesheets in the DOM, otherwise, check loaded count
-      if (
-        !allLoaded &&
-        ((initial && sheets.length >= links.length) || (!initial && loadedCount >= links.length))
-      ) {
-        allLoaded = true;
+    let resolved = false;
+
+    const checkAllLoaded = () => {
+      if (resolved) return;
+
+      const allLoaded = links.every(l => !!l.sheet);
+
+      // tslint:disable:no-console
+      // console.info('[WFSSL]');
+      // console.info('[WFSSL] ---- check ----');
+      // console.info('[WFSSL] check: allLoaded: ', allLoaded);
+      // tslint:enable:no-console
+
+      if (allLoaded) {
+        resolved = true;
         resolve();
       }
     };
 
-    checkAllLoaded(true);
+    // initial check
+    checkAllLoaded();
 
-    if (!allLoaded) {
+    if (!resolved) {
       links.forEach(stylesheet => {
         stylesheet.onload = () => {
-          ++loadedCount;
+          // tslint:disable:no-console
+          // const ss:StyleSheet = event.target as any as StyleSheet;
+          // console.info('[WFSSL]');
+          // console.info('[WFSSL] ---- onLoad ----');
+          // console.info('[WFSSL] onLoad', `${ss.href} -- ${ss.href.substr(-3)} [${links.map(l => l.href).indexOf(ss.href)}]`);
+          // tslint:enable:no-console
+
           checkAllLoaded();
         };
       });
