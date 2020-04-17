@@ -1,10 +1,12 @@
+/* tslint:disable no-function-constructor-with-string-args */
+/* eslint-disable no-new-func, class-methods-use-this */
 import { expect, use } from 'chai';
-import fs from "fs";
-import path from "path";
-import Handlebars from "handlebars";
+import fs from 'fs';
+import path from 'path';
+import Handlebars from 'handlebars';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
-import {renderItem, renderItems} from '../src/lib/utils/dataUtils';
+import { renderItem, renderItems } from '../src/lib/utils/dataUtils';
 
 import initComponents from '../src/lib/utils/initComponents';
 import { registerComponent } from '../src/lib/utils/componentStore';
@@ -15,8 +17,11 @@ use(sinonChai);
 describe('dataUtils', () => {
   describe('renderItem', () => {
     it('should replace an item', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -24,7 +29,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -55,10 +60,11 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'});
+      const item = renderItem<HTMLDivElement>(div, template, { text: 'foobar' });
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(destructSpy).to.have.been.calledTwice;
       expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
@@ -67,8 +73,11 @@ describe('dataUtils', () => {
     });
 
     it('should append an item', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -76,7 +85,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -107,23 +116,27 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const item = renderItem<HTMLDivElement>(div, template, {text: 'foobar'}, true);
+      const item = renderItem<HTMLDivElement>(div, template, { text: 'foobar' }, true);
 
       expect(mountSpy).to.have.been.calledThrice;
       expect(adoptSpy).to.have.been.calledThrice;
+      expect(destructSpy).to.have.not.been.called;
       expect(item).to.not.be.oneOf([null, undefined, false]);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 
       expect(fooCount).to.equal(3);
     });
+
   });
 
-
   describe('renderItems', () => {
-    it('should replace a items', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+    it('should replace all items', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
@@ -131,7 +144,7 @@ describe('dataUtils', () => {
       const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -162,10 +175,14 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}]);
+      const items = renderItems<HTMLDivElement>(div, template, [
+        { text: 'foobar' },
+        { text: 'baz' },
+      ]);
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
+      expect(destructSpy).to.have.been.callCount(2);
       expect(items.length).to.equal(2);
 
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
@@ -174,16 +191,18 @@ describe('dataUtils', () => {
     });
 
     it('should append items', () => {
-
-      const compiled:any = new Function('return ' + Handlebars.precompile(fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8')))();
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
       const template = Handlebars.template(compiled);
 
       const mountSpy = spy();
       const adoptSpy = spy();
-      const destructSpy = spy();
 
       const foo = class Foo {
-        static displayName:string = 'foo';
+        static displayName: string = 'foo';
 
         constructor() {
           // dom ready
@@ -193,10 +212,6 @@ describe('dataUtils', () => {
         adopted() {
           // fully adopted in tree
           adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
         }
       };
       registerComponent(foo);
@@ -214,7 +229,12 @@ describe('dataUtils', () => {
 
       initComponents(div);
 
-      const items = renderItems<HTMLDivElement>(div, template, [{text: 'foobar'}, {text: 'baz'}], true);
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        [{ text: 'foobar' }, { text: 'baz' }],
+        true,
+      );
 
       expect(mountSpy).to.have.been.callCount(4);
       expect(adoptSpy).to.have.been.callCount(4);
@@ -223,6 +243,196 @@ describe('dataUtils', () => {
       const fooCount = div.querySelectorAll('[data-component="foo"]').length;
 
       expect(fooCount).to.equal(4);
+    });
+
+    it('should replace all items, each with provided wrapper element', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
+      const template = Handlebars.template(compiled);
+
+      const mountSpy = spy();
+      const destructSpy = spy();
+
+      const foo = class Foo {
+        static displayName: string = 'foo';
+
+        constructor() {
+          // dom ready
+          mountSpy('foo');
+        }
+
+        dispose() {
+          destructSpy('foo');
+        }
+      };
+      registerComponent(foo);
+
+      const div = createHTML(`
+        <div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+        </div>
+      `);
+
+      initComponents(div);
+
+      const wrapperElement = createHTML('<div data-wrapper="bar"></div>');
+      const data = [
+        { text: 'foobar' },
+        { text: 'baz' },
+        { text: 'ipsum'}
+      ];
+
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        data,
+        false,
+        wrapperElement
+      );
+
+      expect(mountSpy).to.have.been.callCount(5);
+      expect(destructSpy).to.have.been.callCount(2);
+      expect(items.length).to.equal(3);
+
+      const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
+
+      expect(wrapperCount).to.equal(3);
+    });
+
+    it('should append items with provided wrapper element', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
+      const template = Handlebars.template(compiled);
+
+      const mountSpy = spy();
+
+      const foo = class Foo {
+        static displayName: string = 'foo';
+
+        constructor() {
+          // dom ready
+          mountSpy('foo');
+        }
+      };
+      registerComponent(foo);
+
+      const div = createHTML(`
+        <div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+        </div>
+      `);
+
+      initComponents(div);
+
+      const wrapperElement = createHTML('<div data-wrapper="bar"></div>');
+      const data = [
+        { text: 'foobar' },
+        { text: 'baz' },
+        { text: 'ipsum'}
+      ];
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        data,
+        true,
+        wrapperElement
+      );
+
+      expect(mountSpy).to.have.been.callCount(5);
+      expect(items.length).to.equal(3);
+
+      const wrapperCount = div.querySelectorAll('[data-wrapper="bar"]').length;
+      expect(wrapperCount).to.equal(5);
+    });
+
+    it('should append items with nested wrapper element', () => {
+      const compiled: any = new Function(
+        `return ${Handlebars.precompile(
+          fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
+        )}`,
+      )();
+      const template = Handlebars.template(compiled);
+
+      const mountSpy = spy();
+
+      const foo = class Foo {
+        static displayName: string = 'foo';
+
+        constructor() {
+          mountSpy('foo');
+        }
+      };
+      registerComponent(foo);
+
+      const div = createHTML(`
+        <div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+          <div data-wrapper="bar">
+            <div data-component="foo">
+              foo
+            </div>
+          </div>
+        </div>
+      `);
+
+      initComponents(div);
+
+      const wrapperElement = createHTML(`
+        <div data-wrapper="bar">
+          <span data-wrapper="bar-inner"></span>
+        </div>
+      `);
+      const data = [
+        { text: 'foobar' },
+        { text: 'baz' },
+        { text: 'ipsum'}
+      ];
+      const items = renderItems<HTMLDivElement>(
+        div,
+        template,
+        data,
+        true,
+        wrapperElement
+      );
+
+      expect(mountSpy).to.have.been.callCount(5);
+      expect(items.length).to.equal(3);
+
+      const wrapperElements = div.querySelectorAll('[data-wrapper="bar-inner"]');
+      expect(wrapperElements.length).to.equal(3);
+
+      wrapperElements.forEach(element => {
+        const childrenCount = element.children.length;
+        expect(childrenCount).to.equal(1);
+      })
     });
   });
 });

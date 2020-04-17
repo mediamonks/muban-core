@@ -50,7 +50,7 @@ function extractIncludes(content: string) {
   const styles: Array<string> = [];
 
   let strippedContent = content.replace(
-    /<script src=\\["']([^"']+)\\["']><\/script>[\\r\\n]*/gi,
+    /<script[\s]+src=\\["']([^"']+)\\["']><\/script>[\\r\\n]*/gi,
     (_, match) => {
       scripts.push(match);
       return '';
@@ -58,7 +58,7 @@ function extractIncludes(content: string) {
   );
 
   strippedContent = strippedContent.replace(
-    /<link rel=\\["']stylesheet\\["'] href=\\["']([^"']+)\\["']>[\\r\\n]*/gi,
+    /<link[\s]+rel=\\["']stylesheet\\["'][\s]+href=\\["']([^"']+)\\["']>[\\r\\n]*/gi,
     (_, match) => {
       styles.push(match);
       return '';
@@ -141,7 +141,7 @@ function processTemplate(
 ) {
   if (!removeTemplate) {
     if (includeTemplateInBuild) {
-      return content.replace(/require\("([\w/\\. -]+.hbs)"\)/gi, 'require("$1?include")');
+      return content.replace(/require\("([\w/\\. :-]+.hbs)"\)/gi, 'require("$1?include")');
     }
     return content;
   }

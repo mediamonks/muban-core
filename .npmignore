@@ -10,9 +10,11 @@ node_modules/
 /coverage/
 /.nyc_output/
 /tmp/
+/decl/
 
 # .npmignore
 .babelrc
+.codeclimate.yml
 .editorconfig
 .eslintignore
 .eslintrc.js
@@ -25,6 +27,7 @@ node_modules/
 AUTHORS.md
 CONTRIBUTING.md
 tsconfig.json
+tsconfig.build.json
 tslint.json
 /docs
 /example

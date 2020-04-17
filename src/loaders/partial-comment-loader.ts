@@ -1,3 +1,4 @@
+const path = require('path');
 import webpack from 'webpack';
 
 /**
@@ -10,20 +11,23 @@ export default function(this: webpack.loader.LoaderContext, content: string) {
   const done = this.async()!;
   this.cacheable();
 
-  loaderContext.resolve(
-    loaderContext.context,
-    loaderContext.resourcePath,
-    (_, partialName: string) => {
-      // extract and normalize path separators
-      const shortPartialName = partialName.split(/src[\\/](app[\\/])?/)[2].replace(/[/\\]/g, '/');
+  loaderContext.resolve(loaderContext.context, loaderContext.resourcePath, (_, partialName: string) => {
+    // try to match anything after the last /src/ path, and optionally strip/match /app/ as well
+    const commonSourceMatch = partialName.match(/.*src[\\/](?:app[\\/])?(.+?)$/);
+    let shortPartialName;
+    if (commonSourceMatch) {
+      shortPartialName = commonSourceMatch[1].replace(/[/\\]/g, '/');
+    } else {
+      // if above match nog found, take path relative to the webpack project context
+      shortPartialName = path.relative(loaderContext.context, partialName);
+    }
 
-      const newContent = `
+    const newContent = `
 <!-- partial: ${shortPartialName} -->
 ${content.replace(/\s+$/, '')}
 <!-- / ${shortPartialName} -->
 `;
 
-      done(null, newContent);
-    },
-  );
+    done(null, newContent);
+  });
 }

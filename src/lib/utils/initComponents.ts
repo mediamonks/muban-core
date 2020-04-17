@@ -1,4 +1,3 @@
-import sortBy from 'lodash/sortBy';
 import { ComponentModule, getComponents, setComponentInstance } from './componentStore';
 import ICoreComponent from '../interface/ICoreComponent';
 
@@ -43,7 +42,7 @@ export default function initComponents(rootElement: HTMLElement): void {
   // sort list by deepest element first
   // this will make sure that child components are constructed
   // before any parents, allowing the parents to directly reference them
-  const sortedList = sortBy(list, ['depth']).reverse();
+  const sortedList = list.concat().sort((a, b) => b.depth - a.depth);
 
   const newInstances: Array<ICoreComponent> = [];
 

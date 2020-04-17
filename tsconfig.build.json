@@ -4,6 +4,10 @@
     "allowJs": false,
     "outDir": "tmp",
     "declaration": true,
-    "declarationDir": "./"
-  }
+    "declarationDir": "./decl"
+  },
+  "include": [
+    "./src/**/*",
+    "./types/**/*.d.ts"
+  ]
 }

@@ -6,6 +6,7 @@ node_js:
   - 'stable'
   - '6'
   - '8'
+  - '10'
 
 sudo: false
 
@@ -18,5 +19,5 @@ deploy:
     api_key: $NPM_TOKEN
     on:
       tags: true
-      node: '8'
+      node: 'stable'
     skip_cleanup: true
