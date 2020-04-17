@@ -32,9 +32,9 @@ let componentModules: ComponentModules = [];
 declare global {
   interface Window {
     __muban_core__: {
-      store?: {
-        componentInstances?: ComponentInstances;
-        componentModules?: ComponentModules;
+      store: {
+        componentInstances: ComponentInstances;
+        componentModules: ComponentModules;
       };
     };
   }

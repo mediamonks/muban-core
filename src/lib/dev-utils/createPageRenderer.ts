@@ -17,7 +17,7 @@ export default function createPageRenderer({
   onBeforeInit,
   onData,
 }: PageRenderOptions) {
-  return update => {
+  return (update: boolean) => {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
     waitForLoadedStyleSheets(document, true).then(() => {

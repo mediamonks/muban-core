@@ -8,6 +8,14 @@ import createIndexRenderer from './dev-utils/createIndexRenderer';
 import createPageRenderer, { PageRenderOptions } from './dev-utils/createPageRenderer';
 import registerComponent from './dev-utils/registerComponent';
 
+type Renderer = (update?: boolean) => void;
+type Template = (data: any) => string;
+export type Page = {
+  page: string;
+  data: any;
+  link: string;
+};
+
 let indexTemplate;
 let appTemplate;
 
@@ -57,12 +65,14 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   };
 
   if (pageName === 'listing') {
+    // @ts-ignore
     renderer = createIndexRenderer({ ...renderOptions, template: indexTemplate });
   } else {
     renderer = createPageRenderer({
       ...renderOptions,
       pageName,
       template: appTemplate,
+      // @ts-ignore
       onData: options.onData,
     });
   }
@@ -72,6 +82,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   });
 
   return {
+    // @ts-ignore
     updateData(changedContext: __WebpackModuleApi.RequireContext) {
       const changedModules = getChanged(changedContext, jsonModules);
 

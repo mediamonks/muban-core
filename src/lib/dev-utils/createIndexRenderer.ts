@@ -1,6 +1,7 @@
 import path from 'path';
 import { waitForLoadedStyleSheets } from '../utils/waitForStyleSheetsLoaded';
 import initComponents from '../utils/initComponents';
+import { Page } from '../dev';
 
 export type IndexRenderOptions = {
   appRoot: HTMLElement;
@@ -19,7 +20,7 @@ export default function createIndexRenderer({
   onUpdate,
   onBeforeInit,
 }: IndexRenderOptions) {
-  return update => {
+  return (update: boolean) => {
     const pages = getPages(jsonModules);
 
     const categoryMap = mapCategories(pages);
@@ -86,8 +87,8 @@ function getPages(jsonModules: { [key: string]: any }) {
     }));
 }
 
-function mapCategories(pages) {
-  return pages.reduce((cats, page) => {
+function mapCategories(pages: ReadonlyArray<Page>) {
+  return pages.reduce((cats: any, page) => {
     const category = page.data.meta.category || 'default';
     if (!cats[category]) {
       cats[category] = [];
