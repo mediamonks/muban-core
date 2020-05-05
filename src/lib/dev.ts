@@ -8,6 +8,14 @@ import createIndexRenderer from './dev-utils/createIndexRenderer';
 import createPageRenderer, { PageRenderOptions } from './dev-utils/createPageRenderer';
 import registerComponent from './dev-utils/registerComponent';
 
+type Renderer = (update?: boolean) => void;
+type Template = (data: any) => string;
+export type Page = {
+  page: string;
+  data: any;
+  link: string;
+};
+
 let indexTemplate;
 let appTemplate;
 
@@ -25,7 +33,7 @@ export type BootstrapOptions = Partial<
 
 export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   // Get info for current page
-  let pageName;
+  let pageName: string;
   if (options.pageName) {
     pageName = options.pageName;
   } else {
@@ -36,7 +44,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   indexTemplate = options.indexTemplate;
   appTemplate = options.appTemplate;
 
-  let renderer;
+  let renderer: Renderer;
 
   const update = () => {
     cleanElement(appRoot);
@@ -57,12 +65,14 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   };
 
   if (pageName === 'listing') {
+    // @ts-ignore
     renderer = createIndexRenderer({ ...renderOptions, template: indexTemplate });
   } else {
     renderer = createPageRenderer({
       ...renderOptions,
       pageName,
       template: appTemplate,
+      // @ts-ignore
       onData: options.onData,
     });
   }
@@ -72,7 +82,8 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
   });
 
   return {
-    updateData(changedContext) {
+    // @ts-ignore
+    updateData(changedContext: __WebpackModuleApi.RequireContext) {
       const changedModules = getChanged(changedContext, jsonModules);
 
       // only re-render if the current page data is changed
@@ -81,7 +92,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       }
     },
 
-    updatePartials(changedContext) {
+    updatePartials(changedContext: __WebpackModuleApi.RequireContext) {
       // You can't use the previous context here. You _need_ to call require.context again to
       // get the new version. Otherwise you might get errors about using disposed modules
       const changedModules = getChanged(changedContext, partialModules);
@@ -93,7 +104,7 @@ export function bootstrap(appRoot: HTMLElement, options: BootstrapOptions) {
       update();
     },
 
-    update(updatedIndexTemplate, updatedAppTemplate) {
+    update(updatedIndexTemplate: Template, updatedAppTemplate: Template) {
       indexTemplate = updatedIndexTemplate;
       appTemplate = updatedAppTemplate;
 

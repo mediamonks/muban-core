@@ -15,9 +15,12 @@ export default function updateElement(element: HTMLElement, html: string): void 
   // insert the new HTML into a temp container to construct the DOM
   const temp = document.createElement('div');
   temp.innerHTML = html;
-  const newElement = temp.firstChild;
+  const newElement = <Node>temp.firstChild;
 
   // replace the HTML on the page
+  if (!element.parentNode) {
+    throw new Error('Cannot update element: element not mounted in dom');
+  }
   element.parentNode.replaceChild(newElement, element);
 
   // initialize new components for the new element

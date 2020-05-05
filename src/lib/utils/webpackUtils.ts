@@ -1,3 +1,5 @@
+export type ModuleMap = { [key: string]: any };
+
 /**
  * Helper function that stores all modules from the context
  * @param context Passed webpack context
@@ -5,10 +7,10 @@
  * @return {[object,Context]} The stored module, and passed context
  */
 export function getModuleContext(
-  context: any,
+  context: __WebpackModuleApi.RequireContext,
   iterator?: (context: any, key: string, module: any) => void,
-): [{ [key: string]: any }, any] {
-  const modules = {};
+): [ModuleMap, any] {
+  const modules: ModuleMap = {};
 
   context.keys().forEach(key => {
     const module = context(key);
@@ -28,7 +30,7 @@ export function getModuleContext(
  * @param modules The module map for the context
  */
 export function getChanged(
-  reloadedContext: any,
+  reloadedContext: __WebpackModuleApi.RequireContext,
   modules: { [key: string]: string },
 ): Array<{ key: string; content: any }> {
   // To find out what module was changed you just compare the result of the
@@ -36,7 +38,7 @@ export function getChanged(
   // equality. Equal means it is unchanged.
   const changedModules = reloadedContext
     .keys()
-    .map(key => ({ key, content: reloadedContext(key) }))
+    .map((key: string) => ({ key, content: reloadedContext(key) }))
     .filter(({ key, content }) => modules[key] !== content);
 
   changedModules.forEach(({ key, content }) => {

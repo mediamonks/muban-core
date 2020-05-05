@@ -1,4 +1,5 @@
-import { getComponents, setComponentInstance } from './componentStore';
+import { ComponentModule, getComponents, setComponentInstance } from './componentStore';
+import ICoreComponent from '../interface/ICoreComponent';
 
 /**
  * Called to init components for the elements in the DOM.
@@ -12,7 +13,7 @@ import { getComponents, setComponentInstance } from './componentStore';
  * means you can update a new section of HTML at a later time.
  */
 export default function initComponents(rootElement: HTMLElement): void {
-  const list = [];
+  const list: Array<{ component: ComponentModule; element: HTMLElement; depth: number }> = [];
 
   getComponents().forEach(component => {
     const BlockConstructor = component;
@@ -27,15 +28,15 @@ export default function initComponents(rootElement: HTMLElement): void {
     }
 
     // find all DOM elements that belong the this block
-    Array.from(rootElement.querySelectorAll(`[data-component="${displayName}"]`)).forEach(
-      element => {
-        list.push({
-          component,
-          element,
-          depth: getComponentDepth(element as HTMLElement),
-        });
-      },
-    );
+    Array.from(
+      rootElement.querySelectorAll<HTMLElement>(`[data-component="${displayName}"]`),
+    ).forEach(element => {
+      list.push({
+        component,
+        element,
+        depth: getComponentDepth(element as HTMLElement),
+      });
+    });
   });
 
   // sort list by deepest element first
@@ -43,7 +44,7 @@ export default function initComponents(rootElement: HTMLElement): void {
   // before any parents, allowing the parents to directly reference them
   const sortedList = list.concat().sort((a, b) => b.depth - a.depth);
 
-  const newInstances = [];
+  const newInstances: Array<ICoreComponent> = [];
 
   // create all corresponding classes
   sortedList.forEach(({ component, element }) => {

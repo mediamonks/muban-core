@@ -1,16 +1,17 @@
 const path = require('path');
+import webpack from 'webpack';
 
 /**
  * Adds html comments around the partial so it's easily findable
  */
-export default function(this: any, content) {
+export default function(this: webpack.loader.LoaderContext, content: string) {
   // tslint:disable-next-line no-this-assignment
   const loaderContext = this;
 
-  const done = this.async();
+  const done = this.async()!;
   this.cacheable();
 
-  loaderContext.resolve(loaderContext.context, loaderContext.resourcePath, (_, partialName) => {
+  loaderContext.resolve(loaderContext.context, loaderContext.resourcePath, (_, partialName: string) => {
     // try to match anything after the last /src/ path, and optionally strip/match /app/ as well
     const commonSourceMatch = partialName.match(/.*src[\\/](?:app[\\/])?(.+?)$/);
     let shortPartialName;

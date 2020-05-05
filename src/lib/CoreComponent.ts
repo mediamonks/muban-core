@@ -36,10 +36,4 @@ export default class CoreComponent extends Disposable implements ICoreComponent 
   ): Array<T> {
     return Array.from(container.querySelectorAll(selector));
   }
-
-  dispose() {
-    this.element = null;
-
-    super.dispose();
-  }
 }

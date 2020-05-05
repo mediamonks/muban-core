@@ -1,9 +1,10 @@
-export default function registerComponent(path, content, options) {
+export default function registerComponent(path: string, content: any, options: any) {
   const map = options.registerPartialMap || [
-    path => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
+    // @ts-ignore
+    (path: any) => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
   ];
   let res;
-  map.some(x => {
+  map.some((x: any) => {
     if ((res = x(path))) {
       options.Handlebars.registerPartial(res, content);
     }

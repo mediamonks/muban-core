@@ -1,3 +1,5 @@
+import ICoreComponent from '../interface/ICoreComponent';
+
 export type StoredComponentInstance = {
   instance: any;
   element: HTMLElement;
@@ -5,6 +7,7 @@ export type StoredComponentInstance = {
 
 export type ComponentModule = {
   displayName: string;
+  new (element: HTMLElement): ICoreComponent;
 };
 
 /***********************************************
@@ -29,9 +32,9 @@ let componentModules: ComponentModules = [];
 declare global {
   interface Window {
     __muban_core__: {
-      store?: {
-        componentInstances?: ComponentInstances;
-        componentModules?: ComponentModules;
+      store: {
+        componentInstances: ComponentInstances;
+        componentModules: ComponentModules;
       };
     };
   }
@@ -99,7 +102,7 @@ export function registerComponent(component: ComponentModule) {
  *
  * @param component A reference to the component constructor function
  */
-export function updateComponent(component): void {
+export function updateComponent(component: ComponentModule): void {
   const BlockConstructor = component;
   const displayName = BlockConstructor.displayName;
 
@@ -136,7 +139,7 @@ export function setComponentInstance(
 export function removeComponentByElement(
   displayName: string,
   element: HTMLElement,
-): StoredComponentInstance {
+): StoredComponentInstance | null {
   const itemIndex = getComponentInstances(displayName).findIndex(c => c.element === element);
   if (itemIndex !== -1) {
     return getLocalComponentInstances()[displayName].splice(itemIndex, 1)[0];

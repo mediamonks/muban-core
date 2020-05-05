@@ -1,4 +1,5 @@
 import loaderUtils from 'loader-utils';
+import webpack from 'webpack';
 
 /**
  * Processes handlebar templates to import script and style files.
@@ -12,11 +13,11 @@ import loaderUtils from 'loader-utils';
  * For styles:
  * - Changes the html style link to a css file require
  */
-export default function(this: any, content) {
+export default function(this: webpack.loader.LoaderContext, content: string) {
   // tslint:disable-next-line no-this-assignment
   const loaderContext = this;
 
-  const done = this.async();
+  const done = this.async()!;
   this.cacheable();
 
   const options = loaderUtils.getOptions(this);
@@ -44,9 +45,9 @@ export default function(this: any, content) {
   done(null, newContent);
 }
 
-function extractIncludes(content) {
-  const scripts = [];
-  const styles = [];
+function extractIncludes(content: string) {
+  const scripts: Array<string> = [];
+  const styles: Array<string> = [];
 
   let strippedContent = content.replace(
     /<script[\s]+src=\\["']([^"']+)\\["']><\/script>[\\r\\n]*/gi,
@@ -71,7 +72,16 @@ function extractIncludes(content) {
   };
 }
 
-function processScripts(scripts, { loaderContext, removeScript, hot }) {
+interface ProcessScriptsOptions {
+  loaderContext: webpack.loader.LoaderContext;
+  removeScript: boolean;
+  hot: boolean;
+}
+
+function processScripts(
+  scripts: Array<string>,
+  { loaderContext, removeScript, hot }: ProcessScriptsOptions,
+) {
   if (removeScript || !scripts.length) {
     return '';
   }
@@ -102,7 +112,15 @@ if (module.hot) {
 `;
 }
 
-function processStyles(styles, { loaderContext, removeStyle }) {
+interface ProcessStylesOptions {
+  loaderContext: webpack.loader.LoaderContext;
+  removeStyle: boolean;
+}
+
+function processStyles(
+  styles: Array<string>,
+  { loaderContext, removeStyle }: ProcessStylesOptions,
+) {
   if (removeStyle || !styles.length) {
     return '';
   }
@@ -112,7 +130,15 @@ ${styles.map(style => `require(${loaderUtils.stringifyRequest(loaderContext, sty
 `;
 }
 
-function processTemplate(content, { removeTemplate }, includeTemplateInBuild) {
+interface ProcessTemplateOptions {
+  removeTemplate: boolean;
+}
+
+function processTemplate(
+  content: string,
+  { removeTemplate }: ProcessTemplateOptions,
+  includeTemplateInBuild: boolean,
+) {
   if (!removeTemplate) {
     if (includeTemplateInBuild) {
       return content.replace(/require\("([\w/\\. :-]+.hbs)"\)/gi, 'require("$1?include")');
