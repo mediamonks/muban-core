@@ -2,7 +2,7 @@ import Disposable from 'seng-disposable/lib/Disposable';
 import ICoreComponent from './interface/ICoreComponent';
 
 export default class CoreComponent extends Disposable implements ICoreComponent {
-  public element: HTMLElement;
+  public readonly element: HTMLElement;
 
   constructor(element: HTMLElement) {
     super();
@@ -33,13 +33,7 @@ export default class CoreComponent extends Disposable implements ICoreComponent 
   public getElements<T extends Element = HTMLElement>(
     selector: string,
     container: HTMLElement = this.element,
-  ): Array<T> {
+  ): ReadonlyArray<T> {
     return Array.from(container.querySelectorAll(selector));
-  }
-
-  dispose() {
-    this.element = null;
-
-    super.dispose();
   }
 }

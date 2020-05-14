@@ -1,7 +1,7 @@
 import IDisposable from 'seng-disposable/lib/IDisposable';
 
 interface ICoreComponent extends IDisposable {
-  element: HTMLElement;
+  readonly element: HTMLElement;
 
   /**
    * @public
@@ -19,7 +19,10 @@ interface ICoreComponent extends IDisposable {
    * @param {HTMLElement} container
    * @returns {Array<HTMLElement>}
    */
-  getElements<T extends Element = HTMLElement>(selector: string, container?: HTMLElement): Array<T>;
+  getElements<T extends Element = HTMLElement>(
+    selector: string,
+    container?: HTMLElement,
+  ): ReadonlyArray<T>;
 }
 
 export default ICoreComponent;
