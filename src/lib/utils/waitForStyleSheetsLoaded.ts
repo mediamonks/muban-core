@@ -9,11 +9,17 @@ export const waitForLoadedStyleSheets = (document, development = false) =>
     const links = Array.from<HTMLLinkElement>(
       // eslint-disable-next-line no-restricted-properties
       document.querySelectorAll('link[rel=stylesheet]'),
-    ).filter((l) => !development || (l.href && l.href.startsWith('blob:')));
+    )
+      // Some sheets get injected (by extensions) that don't have a source set,
+      // those sheets will get the same source as the page, but will never load
+      .filter((l) => l.href !== document.location.href)
+      // during development, we want to ignore blob-sheets, as they behave weird and will load instantly anyway
+      .filter((l) => !development || (l.href && l.href.startsWith('blob:')));
 
     // console.info('[WFSSL]');
     // console.info('[WFSSL] ---- init ----');
     // console.info('[WFSSL] links: ', links.length);
+    // console.info('[WFSSL] loaded: \n\t', links.map(l => `${l.href} -- ${l.sheet}`).join('\n\t '));
     // console.info('[WFSSL] links: \n\t', links.map(l => `${l.href} -- ${l.href.substr(-3)} - ${l.sheet}`).join('\n\t '));
 
     let resolved = false;
