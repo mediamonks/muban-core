@@ -17,11 +17,11 @@ import ICoreComponent from '../interface/ICoreComponent';
 export default function getComponentForElement<T extends ICoreComponent = ICoreComponent>(
   element: HTMLElement,
 ): T {
-  const displayName = element && element.getAttribute('data-component');
+  const displayName = element?.getAttribute('data-component');
 
   if (displayName && hasComponentInstances(displayName)) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return getComponentInstances(displayName).find((b) => b.element === element)?.instance;
+    return getComponentInstances(displayName).find((b) => b.element === element)?.instance as T;
   }
 
   return null;
