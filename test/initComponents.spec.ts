@@ -1,47 +1,23 @@
+// eslint-disable-next-line max-classes-per-file
 import { expect, use } from 'chai';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
 
 import initComponents from '../src/lib/utils/initComponents';
 import { registerComponent } from '../src/lib/utils/componentStore';
-import { createHTML } from './helpers';
+import { createHTML, getTestComponentClass } from './helpers';
 
 use(sinonChai);
 
 describe('initComponents', () => {
   it('should test mount and adopt lifecycle methods', () => {
+    const mountSpy = spy();
+    const adoptSpy = spy();
 
-    const mountSpy =  spy();
-    const adoptSpy =  spy();
-
-    const foo = class Foo {
-      static displayName: string = 'foo';
-
-      constructor() {
-        // dom ready
-        mountSpy('foo');
-      }
-
-      adopted() {
-        // fully adopted in tree
-        adoptSpy('foo');
-      }
-    };
+    const foo = getTestComponentClass('foo', { mountSpy, adoptSpy });
     registerComponent(foo);
 
-    const bar = class Bar {
-      static displayName: string = 'bar';
-
-      constructor() {
-        // dom ready
-        mountSpy('bar');
-      }
-
-      adopted() {
-        // fully adopted in tree
-        adoptSpy('bar');
-      }
-    };
+    const bar = getTestComponentClass('bar', { mountSpy, adoptSpy });
     registerComponent(bar);
 
     const div = createHTML(`
@@ -66,8 +42,7 @@ describe('initComponents', () => {
     expect(mountSpy).to.have.been.calledBefore(adoptSpy);
 
     // should have called bar before foo
-    expect(mountSpy.args).to.deep.equals([ [ 'bar' ], [ 'foo' ] ]);
-
+    expect(mountSpy.args).to.deep.equals([['bar'], ['foo']]);
 
     const inner = createHTML(`
       <div>

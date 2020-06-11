@@ -1,7 +1,7 @@
-import path from 'path';
 import webpack from 'webpack';
+import path from 'path';
 
-export default (fs, fixture, rules): Promise<any> => {
+export default (fs, fixture, rules): Promise<unknown> => {
   const compiler = webpack({
     context: __dirname,
     entry: `./${fixture}`,
@@ -25,8 +25,8 @@ export default (fs, fixture, rules): Promise<any> => {
   compiler.outputFileSystem = fs;
 
   return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err) reject(err);
+    compiler.run((error, stats) => {
+      if (error) reject(error);
 
       resolve(stats);
     });

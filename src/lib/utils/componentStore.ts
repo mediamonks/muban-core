@@ -1,5 +1,5 @@
 export type StoredComponentInstance = {
-  instance: any;
+  instance: { dispose?: () => void };
   element: HTMLElement;
 };
 
@@ -7,7 +7,7 @@ export type ComponentModule = {
   displayName: string;
 };
 
-/***********************************************
+/** *********************************************
  * Store components and instanced on the Window,
  * because webpack can't re-use the same module
  * between different entry files.
@@ -26,9 +26,11 @@ const componentInstances: ComponentInstances = {};
 // store constructors
 let componentModules: ComponentModules = [];
 
+const MUBAN_CORE_GLOBAL_NAMESPACE = '__muban_core__';
+
 declare global {
   interface Window {
-    __muban_core__: {
+    [MUBAN_CORE_GLOBAL_NAMESPACE]: {
       store?: {
         componentInstances?: ComponentInstances;
         componentModules?: ComponentModules;
@@ -38,8 +40,8 @@ declare global {
 }
 
 if (typeof window !== 'undefined') {
-  window.__muban_core__ = window.__muban_core__ || {};
-  window.__muban_core__.store = window.__muban_core__.store || {
+  window[MUBAN_CORE_GLOBAL_NAMESPACE] = window[MUBAN_CORE_GLOBAL_NAMESPACE] || {};
+  window[MUBAN_CORE_GLOBAL_NAMESPACE].store = window[MUBAN_CORE_GLOBAL_NAMESPACE].store || {
     componentInstances,
     componentModules,
   };
@@ -47,21 +49,21 @@ if (typeof window !== 'undefined') {
 
 function getLocalComponentInstances(): ComponentInstances {
   if (typeof window !== 'undefined') {
-    return window.__muban_core__.store.componentInstances;
+    return window[MUBAN_CORE_GLOBAL_NAMESPACE].store.componentInstances;
   }
   return componentInstances;
 }
 
 function getLocalComponentModules(): ComponentModules {
   if (typeof window !== 'undefined') {
-    return window.__muban_core__.store.componentModules;
+    return window[MUBAN_CORE_GLOBAL_NAMESPACE].store.componentModules;
   }
   return componentModules;
 }
 
 function setLocalComponentModules(modules: ComponentModules): void {
   if (typeof window !== 'undefined') {
-    window.__muban_core__.store.componentModules = modules;
+    window[MUBAN_CORE_GLOBAL_NAMESPACE].store.componentModules = modules;
   } else {
     componentModules = modules;
   }
@@ -69,7 +71,7 @@ function setLocalComponentModules(modules: ComponentModules): void {
 
 /*
  * End global storage hack
- ************************/
+ *********************** */
 
 /**
  * Registers a component class to be initialized later for each DOM element matching the
@@ -83,11 +85,11 @@ export function registerComponent(component: ComponentModule) {
   if (component.displayName) {
     // remove old instance before adding the new one
     setLocalComponentModules(
-      getLocalComponentModules().filter(c => c.displayName !== component.displayName),
+      getLocalComponentModules().filter((c) => c.displayName !== component.displayName),
     );
     getLocalComponentModules().push(component);
   } else {
-    // tslint:disable-next-line no-console
+    // eslint-disable-next-line no-console
     console.error('missing "block" definition on component', component);
   }
 }
@@ -101,11 +103,12 @@ export function registerComponent(component: ComponentModule) {
  */
 export function updateComponent(component): void {
   const BlockConstructor = component;
-  const displayName = BlockConstructor.displayName;
+  const { displayName } = BlockConstructor;
 
   // cleanup and recreate all block instances
-  getComponentInstances(displayName).forEach(c => {
-    c.instance.dispose && c.instance.dispose();
+  getComponentInstances(displayName).forEach((c) => {
+    c.instance.dispose?.();
+    // eslint-disable-next-line no-param-reassign
     c.instance = new BlockConstructor(c.element);
   });
 }
@@ -118,7 +121,7 @@ export function getComponentInstances(displayName: string): Array<StoredComponen
   return getLocalComponentInstances()[displayName] || [];
 }
 
-export function hasComponentInstance(displayName: string): boolean {
+export function hasComponentInstances(displayName: string): boolean {
   return displayName in getLocalComponentInstances();
 }
 
@@ -126,18 +129,19 @@ export function setComponentInstance(
   displayName: string,
   component: StoredComponentInstance,
 ): void {
-  if (!getLocalComponentInstances()[displayName]) {
-    getLocalComponentInstances()[displayName] = [];
+  const instances = getLocalComponentInstances();
+  if (!instances[displayName]) {
+    instances[displayName] = [];
   }
 
-  getLocalComponentInstances()[displayName].push(component);
+  instances[displayName].push(component);
 }
 
 export function removeComponentByElement(
   displayName: string,
   element: HTMLElement,
 ): StoredComponentInstance {
-  const itemIndex = getComponentInstances(displayName).findIndex(c => c.element === element);
+  const itemIndex = getComponentInstances(displayName).findIndex((c) => c.element === element);
   if (itemIndex !== -1) {
     return getLocalComponentInstances()[displayName].splice(itemIndex, 1)[0];
   }

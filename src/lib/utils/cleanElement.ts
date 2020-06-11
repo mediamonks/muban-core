@@ -1,4 +1,4 @@
-import { hasComponentInstance, removeComponentByElement } from './componentStore';
+import { hasComponentInstances, removeComponentByElement } from './componentStore';
 
 /**
  * Remove all instances bound to this html element or its children.
@@ -15,7 +15,7 @@ export default function cleanElement(element: HTMLElement): void {
   const displayName = element.getAttribute('data-component');
 
   // find instance linked to element and clean up
-  if (displayName && hasComponentInstance(displayName)) {
+  if (displayName && hasComponentInstances(displayName)) {
     const removedComponent = removeComponentByElement(displayName, element);
     if (removedComponent && removedComponent.instance && removedComponent.instance.dispose) {
       removedComponent.instance.dispose();

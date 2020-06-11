@@ -1,13 +1,14 @@
 export default function registerComponent(path, content, options) {
   const map = options.registerPartialMap || [
-    path => (path.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(path)[1] : null),
+    (p) => (p.includes('/block/') ? /\/([^/]+)\.hbs/gi.exec(p)[1] : null),
   ];
-  let res;
-  map.some(x => {
-    if ((res = x(path))) {
-      options.Handlebars.registerPartial(res, content);
+  let response;
+  map.some((x) => {
+    response = x(path);
+    if (response) {
+      options.Handlebars.registerPartial(response, content);
     }
     // if we have one match, ignore the others, otherwise we might register a component twice
-    return !!res;
+    return !!response;
   });
 }

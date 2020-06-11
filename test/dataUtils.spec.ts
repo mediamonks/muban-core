@@ -1,23 +1,22 @@
-/* tslint:disable no-function-constructor-with-string-args */
-/* eslint-disable no-new-func, class-methods-use-this */
+/* eslint-disable max-lines, class-methods-use-this, no-new-func */
 import { expect, use } from 'chai';
-import fs from 'fs';
-import path from 'path';
 import Handlebars from 'handlebars';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
+import path from 'path';
+import fs from 'fs';
 import { renderItem, renderItems } from '../src/lib/utils/dataUtils';
 
 import initComponents from '../src/lib/utils/initComponents';
 import { registerComponent } from '../src/lib/utils/componentStore';
-import { createHTML } from './helpers';
+import { createHTML, getTestComponentClass } from './helpers';
 
 use(sinonChai);
 
 describe('dataUtils', () => {
   describe('renderItem', () => {
     it('should replace an item', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -28,23 +27,7 @@ describe('dataUtils', () => {
       const adoptSpy = spy();
       const destructSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy, adoptSpy, destructSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -73,7 +56,7 @@ describe('dataUtils', () => {
     });
 
     it('should append an item', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -84,23 +67,7 @@ describe('dataUtils', () => {
       const adoptSpy = spy();
       const destructSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy, adoptSpy, destructSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -127,12 +94,11 @@ describe('dataUtils', () => {
 
       expect(fooCount).to.equal(3);
     });
-
   });
 
   describe('renderItems', () => {
     it('should replace all items', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -143,23 +109,7 @@ describe('dataUtils', () => {
       const adoptSpy = spy();
       const destructSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy, adoptSpy, destructSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -191,7 +141,7 @@ describe('dataUtils', () => {
     });
 
     it('should append items', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -201,19 +151,7 @@ describe('dataUtils', () => {
       const mountSpy = spy();
       const adoptSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-
-        adopted() {
-          // fully adopted in tree
-          adoptSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy, adoptSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -246,7 +184,7 @@ describe('dataUtils', () => {
     });
 
     it('should replace all items, each with provided wrapper element', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -256,18 +194,7 @@ describe('dataUtils', () => {
       const mountSpy = spy();
       const destructSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-
-        dispose() {
-          destructSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy, destructSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -288,19 +215,9 @@ describe('dataUtils', () => {
       initComponents(div);
 
       const wrapperElement = createHTML('<div data-wrapper="bar"></div>');
-      const data = [
-        { text: 'foobar' },
-        { text: 'baz' },
-        { text: 'ipsum'}
-      ];
+      const data = [{ text: 'foobar' }, { text: 'baz' }, { text: 'ipsum' }];
 
-      const items = renderItems<HTMLDivElement>(
-        div,
-        template,
-        data,
-        false,
-        wrapperElement
-      );
+      const items = renderItems<HTMLDivElement>(div, template, data, false, wrapperElement);
 
       expect(mountSpy).to.have.been.callCount(5);
       expect(destructSpy).to.have.been.callCount(2);
@@ -312,7 +229,7 @@ describe('dataUtils', () => {
     });
 
     it('should append items with provided wrapper element', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -321,14 +238,7 @@ describe('dataUtils', () => {
 
       const mountSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          // dom ready
-          mountSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -349,18 +259,8 @@ describe('dataUtils', () => {
       initComponents(div);
 
       const wrapperElement = createHTML('<div data-wrapper="bar"></div>');
-      const data = [
-        { text: 'foobar' },
-        { text: 'baz' },
-        { text: 'ipsum'}
-      ];
-      const items = renderItems<HTMLDivElement>(
-        div,
-        template,
-        data,
-        true,
-        wrapperElement
-      );
+      const data = [{ text: 'foobar' }, { text: 'baz' }, { text: 'ipsum' }];
+      const items = renderItems<HTMLDivElement>(div, template, data, true, wrapperElement);
 
       expect(mountSpy).to.have.been.callCount(5);
       expect(items.length).to.equal(3);
@@ -370,7 +270,7 @@ describe('dataUtils', () => {
     });
 
     it('should append items with nested wrapper element', () => {
-      const compiled: any = new Function(
+      const compiled: () => void = new Function(
         `return ${Handlebars.precompile(
           fs.readFileSync(path.resolve(__dirname, './mock/foo.hbs'), 'utf-8'),
         )}`,
@@ -379,13 +279,7 @@ describe('dataUtils', () => {
 
       const mountSpy = spy();
 
-      const foo = class Foo {
-        static displayName: string = 'foo';
-
-        constructor() {
-          mountSpy('foo');
-        }
-      };
+      const foo = getTestComponentClass('foo', { mountSpy });
       registerComponent(foo);
 
       const div = createHTML(`
@@ -410,18 +304,8 @@ describe('dataUtils', () => {
           <span data-wrapper="bar-inner"></span>
         </div>
       `);
-      const data = [
-        { text: 'foobar' },
-        { text: 'baz' },
-        { text: 'ipsum'}
-      ];
-      const items = renderItems<HTMLDivElement>(
-        div,
-        template,
-        data,
-        true,
-        wrapperElement
-      );
+      const data = [{ text: 'foobar' }, { text: 'baz' }, { text: 'ipsum' }];
+      const items = renderItems<HTMLDivElement>(div, template, data, true, wrapperElement);
 
       expect(mountSpy).to.have.been.callCount(5);
       expect(items.length).to.equal(3);
@@ -429,10 +313,10 @@ describe('dataUtils', () => {
       const wrapperElements = div.querySelectorAll('[data-wrapper="bar-inner"]');
       expect(wrapperElements.length).to.equal(3);
 
-      wrapperElements.forEach(element => {
+      wrapperElements.forEach((element) => {
         const childrenCount = element.children.length;
         expect(childrenCount).to.equal(1);
-      })
+      });
     });
   });
 });

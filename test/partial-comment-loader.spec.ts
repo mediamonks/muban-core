@@ -1,13 +1,13 @@
 import { expect } from 'chai';
-import fs from 'fs';
-import path from 'path';
 import Memoryfs from 'memory-fs';
 import requireFromString from 'require-from-string';
+import fs from 'fs';
+import path from 'path';
 import compiler from './compiler';
 
 function getOutput(stats) {
-  if (stats.toJson().errors.length) {
-    // tslint:disable-next-line no-console
+  if (stats.toJson().errors.length > 0) {
+    // eslint-disable-next-line no-console
     console.error(stats.toJson().errors);
   }
 

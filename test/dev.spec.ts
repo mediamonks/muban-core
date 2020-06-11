@@ -1,3 +1,4 @@
+// eslint-disable-next-line unicorn/prevent-abbreviations
 import { expect, use } from 'chai';
 import { spy } from 'sinon';
 import sinonChai from 'sinon-chai';
@@ -8,7 +9,7 @@ import { bootstrap } from '../src/lib/dev';
 
 use(sinonChai);
 
-const createContext = files => {
+const createContext = (files) => {
   // tslint:disable-next-line function-name
   function Module(file) {
     return files[file];
@@ -42,8 +43,8 @@ describe('dev', () => {
       Handlebars,
       dataContext,
       partialsContext,
-      indexTemplate: (data: object) => data.toString(),
-      appTemplate: (data: object) =>  data.toString(),
+      indexTemplate: (data: unknown) => data.toString(),
+      appTemplate: (data: unknown) => data.toString(),
       onData: onDataSpy,
       pageName: 'home',
     });
@@ -51,7 +52,7 @@ describe('dev', () => {
 
     setTimeout(() => {
       expect(onDataSpy).to.have.been.calledOnce;
-      expect(onDataSpy).to.have.been.calledWithMatch({ name: 'home-content'}, 'home');
+      expect(onDataSpy).to.have.been.calledWithMatch({ name: 'home-content' }, 'home');
       done();
     }, 100);
   });
@@ -78,10 +79,10 @@ describe('dev', () => {
       Handlebars,
       dataContext,
       partialsContext,
-      appTemplate: (data: object) => data.toString(),
-      indexTemplate: (data: object) => {
+      appTemplate: (data: unknown) => data.toString(),
+      indexTemplate: (data: unknown) => {
         onRenderSpy(data);
-        return data.toString()
+        return data.toString();
       },
       pageName: 'listing',
     });

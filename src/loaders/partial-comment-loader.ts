@@ -1,10 +1,13 @@
-const path = require('path');
+import path from 'path';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type LoaderContext = any;
 
 /**
  * Adds html comments around the partial so it's easily findable
  */
-export default function(this: any, content) {
-  // tslint:disable-next-line no-this-assignment
+export default function (this: LoaderContext, content: string) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
   const loaderContext = this;
 
   const done = this.async();

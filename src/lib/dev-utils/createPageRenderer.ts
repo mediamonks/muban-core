@@ -4,7 +4,7 @@ import { IndexRenderOptions } from './createIndexRenderer';
 
 export type PageRenderOptions = IndexRenderOptions & {
   pageName: string;
-  onData: (data: object, pageName: string) => object;
+  onData: (data: Record<string, unknown>, pageName: string) => Record<string, unknown>;
 };
 
 export default function createPageRenderer({
@@ -17,18 +17,18 @@ export default function createPageRenderer({
   onBeforeInit,
   onData,
 }: PageRenderOptions) {
-  return update => {
+  return (update) => {
     // giving the browser some time to inject the styles
     // so when components are constructed, the styles are all applied
     waitForLoadedStyleSheets(document, true).then(() => {
-      const dataFileName = Object.keys(jsonModules).find(key =>
+      const dataFileName = Object.keys(jsonModules).find((key) =>
         new RegExp(`[\\/\\\\]${pageName}\\.`).test(key),
       );
       let data;
       if (dataFileName) {
         data = jsonModules[dataFileName];
       } else {
-        /* tslint:disable-next-line no-console */
+        // eslint-disable-next-line no-console
         console.info(`Data for page "${pageName}" could not be found.`);
       }
       // execute when exported as js function
@@ -36,16 +36,17 @@ export default function createPageRenderer({
         data = data();
       }
       // render page with data
+      // eslint-disable-next-line no-param-reassign
       appRoot.innerHTML = template(onData ? onData(data, pageName) || {} : data);
 
       if (!update) {
-        onBeforeInit && onBeforeInit();
+        onBeforeInit?.();
       }
 
       // init components
       initComponents(appRoot);
 
-      update ? onUpdate && onUpdate() : onInit && onInit();
+      (update ? onUpdate : onInit)?.();
     });
   };
 }

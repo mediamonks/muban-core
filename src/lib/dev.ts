@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 /**
  * This file is only used during development.
  * It's set up to render the hbs templates in the DOM using javascript, and supports hot reloading.
@@ -14,11 +15,11 @@ let appTemplate;
 export type BootstrapOptions = Partial<
   Pick<PageRenderOptions, 'onInit' | 'onUpdate' | 'onData' | 'onBeforeInit'>
 > & {
-  indexTemplate: (data: any) => string;
-  appTemplate: (data: any) => string;
-  dataContext: any;
-  partialsContext: any;
-  Handlebars: any;
+  indexTemplate: (data: Record<string, unknown>) => string;
+  appTemplate: (data: Record<string, unknown>) => string;
+  dataContext: unknown;
+  partialsContext: unknown;
+  Handlebars: unknown;
   registerPartialMap?: Array<(path: string) => string | null>;
   pageName?: string;
 };

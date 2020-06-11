@@ -4,7 +4,7 @@ import ICoreComponent from './interface/ICoreComponent';
 export default class CoreComponent extends Disposable implements ICoreComponent {
   public readonly element: HTMLElement;
 
-  constructor(element: HTMLElement) {
+  public constructor(element: HTMLElement) {
     super();
     this.element = element;
   }

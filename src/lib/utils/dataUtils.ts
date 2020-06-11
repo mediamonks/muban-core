@@ -3,8 +3,8 @@ import initComponents from './initComponents';
 
 export function renderItem<T extends Element = HTMLElement>(
   container: HTMLElement,
-  template: (data?: any) => string,
-  data: any,
+  template: (data?: Record<string, unknown>) => string,
+  data: Record<string, unknown>,
   append: boolean = false,
 ): T {
   return render<T>(container, append, () => createHtml(template(data)))[0];
@@ -12,20 +12,21 @@ export function renderItem<T extends Element = HTMLElement>(
 
 export function renderItems<T extends Element = HTMLElement>(
   container: HTMLElement,
-  template: (data?: any) => string,
-  data: Array<any>,
+  template: (data?: Record<string, unknown>) => string,
+  data: Array<Record<string, unknown>>,
   append: boolean = false,
   listElementWrapper?: HTMLElement,
 ) {
   let generateStringTemplate: () => HTMLElement | DocumentFragment;
   if (listElementWrapper) {
     generateStringTemplate = () => {
-      return data.reduce<DocumentFragment>((tempContainer, d) => {
-        const templateHtml = createHtml(template(d), <HTMLElement>listElementWrapper.cloneNode(
-          true,
-        ));
-        tempContainer.appendChild(templateHtml);
-        return tempContainer;
+      return data.reduce<DocumentFragment>((temporaryContainer, d) => {
+        const templateHtml = createHtml(
+          template(d),
+          (listElementWrapper as HTMLElement).cloneNode(true) as HTMLElement,
+        );
+        temporaryContainer.appendChild(templateHtml);
+        return temporaryContainer;
       }, document.createDocumentFragment());
     };
   } else {
@@ -38,17 +39,18 @@ export function renderItems<T extends Element = HTMLElement>(
 }
 
 function createHtml(innerHtml: string, container?: HTMLElement) {
-  const div = container ? container : document.createElement('div');
+  const div = container || document.createElement('div');
   appendToDeepestNode(innerHtml, div);
   return div;
 }
 
 function appendToDeepestNode(innerHtml: string, element: HTMLElement): HTMLElement {
   if (!element.firstElementChild) {
+    // eslint-disable-next-line no-param-reassign
     element.innerHTML = innerHtml;
     return element;
   }
-  return appendToDeepestNode(innerHtml, <HTMLElement>element.firstElementChild);
+  return appendToDeepestNode(innerHtml, element.firstElementChild as HTMLElement);
 }
 
 function render<T extends Element = HTMLElement>(
@@ -60,24 +62,20 @@ function render<T extends Element = HTMLElement>(
     // dispose all created component instances
     cleanElement(container);
     while (container.children.length) {
-      container.removeChild(container.children[0]);
+      container.children[0].remove();
     }
   }
   const fragment = document.createDocumentFragment();
-  const children = <Array<T>>Array.from(getHtml().children);
+  const children = Array.from<T>((getHtml().children as unknown) as Array<T>);
 
-  for (const child of children) {
-    fragment.appendChild(child);
-  }
+  children.forEach((child) => fragment.appendChild(child));
 
   container.appendChild(fragment);
 
   if (append) {
     // only init the newly added component(s)
-    for (const child of children) {
-      // TODO: Element (T) cannot be cast to HTMLElement (from initComponents)
-      initComponents(<HTMLElement>(<any>child));
-    }
+    // TODO: Element (T) cannot be cast to HTMLElement (from initComponents)
+    children.forEach((child) => initComponents((child as unknown) as HTMLElement));
   } else {
     // initialize new components for the new element
     initComponents(container);

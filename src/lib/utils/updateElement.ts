@@ -13,13 +13,13 @@ export default function updateElement(element: HTMLElement, html: string): void 
   cleanElement(element);
 
   // insert the new HTML into a temp container to construct the DOM
-  const temp = document.createElement('div');
-  temp.innerHTML = html;
-  const newElement = temp.firstChild;
+  const temporary = document.createElement('div');
+  temporary.innerHTML = html;
+  const newElement = temporary.firstChild;
 
   // replace the HTML on the page
   element.parentNode.replaceChild(newElement, element);
 
   // initialize new components for the new element
-  initComponents(<HTMLElement>newElement);
+  initComponents(newElement as HTMLElement);
 }

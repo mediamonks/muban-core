@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Helper function that stores all modules from the context
  * @param context Passed webpack context
@@ -10,7 +11,7 @@ export function getModuleContext(
 ): [{ [key: string]: any }, any] {
   const modules = {};
 
-  context.keys().forEach(key => {
+  context.keys().forEach((key) => {
     const module = context(key);
     modules[key] = module;
 
@@ -36,10 +37,11 @@ export function getChanged(
   // equality. Equal means it is unchanged.
   const changedModules = reloadedContext
     .keys()
-    .map(key => ({ key, content: reloadedContext(key) }))
+    .map((key) => ({ key, content: reloadedContext(key) }))
     .filter(({ key, content }) => modules[key] !== content);
 
   changedModules.forEach(({ key, content }) => {
+    // eslint-disable-next-line no-param-reassign
     modules[key] = content;
   });
 

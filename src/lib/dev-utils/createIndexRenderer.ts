@@ -4,8 +4,9 @@ import initComponents from '../utils/initComponents';
 
 export type IndexRenderOptions = {
   appRoot: HTMLElement;
-  template: (data: any) => string;
-  jsonModules: { [key: string]: any };
+  template: (data: Record<string, unknown>) => string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jsonModules: Record<string, Record<string, any>>;
   onInit: () => void;
   onUpdate: () => void;
   onBeforeInit: () => void;
@@ -19,17 +20,18 @@ export default function createIndexRenderer({
   onUpdate,
   onBeforeInit,
 }: IndexRenderOptions) {
-  return update => {
+  return (update) => {
     const pages = getPages(jsonModules);
 
     const categoryMap = mapCategories(pages);
 
-    const categories = Object.keys(categoryMap).map(key => ({
+    const categories = Object.keys(categoryMap).map((key) => ({
       name: key,
       pages: categoryMap[key],
     }));
 
     waitForLoadedStyleSheets(document, true).then(() => {
+      // eslint-disable-next-line no-param-reassign
       appRoot.innerHTML = template({
         pages,
         categories,
@@ -37,19 +39,20 @@ export default function createIndexRenderer({
       });
 
       if (!update) {
-        onBeforeInit && onBeforeInit();
+        onBeforeInit?.();
       }
 
       initComponents(appRoot);
 
-      update ? onUpdate && onUpdate() : onInit && onInit();
+      (update ? onUpdate : onInit)?.();
     });
   };
 }
 
-function getPages(jsonModules: { [key: string]: any }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function getPages(jsonModules: { [key: string]: Record<string, any> }) {
   return Object.keys(jsonModules)
-    .map(key => {
+    .map((key) => {
       const item = {
         page: path.basename(key, `.${key.split('.').pop()}`),
         data: jsonModules[key],
@@ -89,10 +92,8 @@ function getPages(jsonModules: { [key: string]: any }) {
 function mapCategories(pages) {
   return pages.reduce((cats, page) => {
     const category = page.data.meta.category || 'default';
-    if (!cats[category]) {
-      cats[category] = [];
-    }
-    cats[category].push(page);
-    return cats;
+    const categoryList = cats[category] || [];
+    categoryList.push(page);
+    return { ...cats, [category]: categoryList };
   }, {});
 }
