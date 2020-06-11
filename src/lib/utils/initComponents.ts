@@ -20,22 +20,26 @@ export default function initComponents(rootElement: HTMLElement): void {
     const BlockConstructor = component;
     const { displayName } = BlockConstructor;
 
-    if (rootElement.getAttribute('data-component') === displayName) {
-      list.push({
-        component,
-        element: rootElement,
-        depth: getComponentDepth(rootElement as HTMLElement),
-      });
+    if (!hasComponentInstance(rootElement)) {
+      if (rootElement.getAttribute('data-component') === displayName) {
+        list.push({
+          component,
+          element: rootElement,
+          depth: getComponentDepth(rootElement as HTMLElement),
+        });
+      }
     }
 
     // find all DOM elements that belong the this block
     Array.from(rootElement.querySelectorAll(`[data-component="${displayName}"]`)).forEach(
-      element => {
-        list.push({
-          component,
-          element,
-          depth: getComponentDepth(element as HTMLElement),
-        });
+      (element) => {
+        if (!hasComponentInstance(element as HTMLElement)) {
+          list.push({
+            component,
+            element,
+            depth: getComponentDepth(element as HTMLElement),
+          });
+        }
       },
     );
   });

@@ -61,4 +61,44 @@ describe('initComponents', () => {
     expect(mountSpy.args).to.deep.equal([['bar'], ['foo'], ['foo']]);
     expect(adoptSpy.args).to.deep.equal([['bar'], ['foo'], ['foo']]);
   });
+
+  it('should test if components are not initialized twice', () => {
+    const mountSpy = spy();
+    const adoptSpy = spy();
+
+    const foo = getTestComponentClass('foo', { mountSpy, adoptSpy });
+    registerComponent(foo);
+
+    const bar = getTestComponentClass('bar', { mountSpy, adoptSpy });
+    registerComponent(bar);
+
+    const fooDiv = createHTML(`
+      <div>
+        <div data-component="foo">
+          foo
+          <div class="container"></div>
+        </div>
+      </div>
+    `);
+    const barDiv = createHTML(`
+      <div data-component="bar">
+        Foobar
+      </div>`);
+
+    initComponents(fooDiv);
+
+    // should have been called twice
+    expect(mountSpy).to.have.been.calledOnce;
+    expect(adoptSpy).to.have.been.calledOnce;
+
+    fooDiv.querySelector('.container').appendChild(barDiv);
+
+    initComponents(fooDiv);
+
+    expect(mountSpy).to.have.been.calledTwice;
+    expect(adoptSpy).to.have.been.calledTwice;
+
+    expect(mountSpy.args).to.deep.equal([['foo'], ['bar']]);
+    expect(adoptSpy.args).to.deep.equal([['foo'], ['bar']]);
+  });
 });

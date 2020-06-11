@@ -125,6 +125,24 @@ export function hasComponentInstances(displayName: string): boolean {
   return displayName in getLocalComponentInstances();
 }
 
+/**
+ * Returns the component instance (JS class + element) for a given element
+ */
+export function getComponentInstance(element: HTMLElement): StoredComponentInstance | null {
+  const displayName = element.dataset.component;
+  const instances = getComponentInstances(displayName);
+  return instances.find((instance) => instance.element === element) ?? null;
+}
+
+/**
+ * Returns true of the passed element has a component instance created for it
+ */
+export function hasComponentInstance(element: HTMLElement): boolean {
+  const displayName = element.dataset.component;
+  const instances = getComponentInstances(displayName);
+  return instances.some((instance) => instance.element === element);
+}
+
 export function setComponentInstance(
   displayName: string,
   component: StoredComponentInstance,
