@@ -4,8 +4,8 @@
  * @param document - the html document
  * @param dev - if in dev mode, it will only check 'blob' urls that are injected by style loaders
  */
-export const waitForLoadedStyleSheets = (document, development = false) =>
-  new Promise((resolve) => {
+export const waitForLoadedStyleSheets = (document: Document, development = false): Promise<void> =>
+  new Promise<void>((resolve) => {
     const links = Array.from<HTMLLinkElement>(
       // eslint-disable-next-line no-restricted-properties
       document.querySelectorAll('link[rel=stylesheet]'),
