@@ -87,7 +87,7 @@
     "eslint-plugin-unicorn": "^20.1.0",
     "handlebars": "^4.1.2",
     "husky": "^0.14.3",
-    "jsdom": "^11.5.1",
+    "jsdom": "^16.5.0",
     "jsdom-global": "^3.0.2",
     "lint-staged": "^6.0.0",
     "memory-fs": "^0.4.1",
