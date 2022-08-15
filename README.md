@@ -1,4 +1,11 @@
-# muban-core
+# :no_entry: [DEPRECATED] muban-core
+
+> :warning: **This version will not receive any future updates, there is a new version**
+>
+> The `muban` repository and `muban-core` package will not receive any future updates.
+> 
+> There is a new version in active development at [github.com/mubanjs](https://github.com/mubanjs)
+> (also called v2), with modern features and a full ecosystem for storybook, testing, hooks, etc.
 
 This package contains the core library and webpack loaders for [Muban](https://mediamonks.github.com/muban).
 Please have a look at the main repo for more information. 
