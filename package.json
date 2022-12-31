@@ -102,12 +102,12 @@
     "sinon-chai": "^2.14.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.9.5",
-    "webpack": "^4.26.1"
+    "webpack": "^5.75.0"
   },
   "dependencies": {
     "@babel/plugin-syntax-import-meta": "^7.10.1",
     "@babel/runtime": "^7.10.2",
-    "loader-utils": "^1.1.0",
+    "loader-utils": "^3.2.1",
     "seng-disposable": "^1.1.3"
   }
 }
